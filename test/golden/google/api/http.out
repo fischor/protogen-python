@@ -1,0 +1,65 @@
+# Generated code output.
+
+dependencies:
+
+messages:
+- name: google.api.Http
+  fields:
+  - name: google.api.Http.rules
+    message: google.api.HttpRule
+    enum: None
+  - name: google.api.Http.fully_decode_reserved_expansion
+    message: None
+    enum: None
+  messages:
+  enums:
+- name: google.api.HttpRule
+  fields:
+  - name: google.api.HttpRule.selector
+    message: None
+    enum: None
+  - name: google.api.HttpRule.get
+    message: None
+    enum: None
+  - name: google.api.HttpRule.put
+    message: None
+    enum: None
+  - name: google.api.HttpRule.post
+    message: None
+    enum: None
+  - name: google.api.HttpRule.delete
+    message: None
+    enum: None
+  - name: google.api.HttpRule.patch
+    message: None
+    enum: None
+  - name: google.api.HttpRule.custom
+    message: google.api.CustomHttpPattern
+    enum: None
+  - name: google.api.HttpRule.body
+    message: None
+    enum: None
+  - name: google.api.HttpRule.response_body
+    message: None
+    enum: None
+  - name: google.api.HttpRule.additional_bindings
+    message: google.api.HttpRule
+    enum: None
+  messages:
+  enums:
+- name: google.api.CustomHttpPattern
+  fields:
+  - name: google.api.CustomHttpPattern.kind
+    message: None
+    enum: None
+  - name: google.api.CustomHttpPattern.path
+    message: None
+    enum: None
+  messages:
+  enums:
+
+enums:
+
+services:
+
+extensions:

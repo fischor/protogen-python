@@ -1,0 +1,30 @@
+# Generated code output.
+
+dependencies:
+- name: google/protobuf/any.proto
+  num_dependencies: 0
+  num_messages: 1
+  num_enums: 0
+  num_services: 0
+  num_extensions: 0
+
+messages:
+- name: google.api.HttpBody
+  fields:
+  - name: google.api.HttpBody.content_type
+    message: None
+    enum: None
+  - name: google.api.HttpBody.data
+    message: None
+    enum: None
+  - name: google.api.HttpBody.extensions
+    message: google.protobuf.Any
+    enum: None
+  messages:
+  enums:
+
+enums:
+
+services:
+
+extensions:

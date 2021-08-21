@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "protogen"
+version = "0.1.1-alpha.0"
+description = "todo"
+authors = ["fischor <fischor@norep.ly>"]
+license = "todo"
+
+[tool.poetry.dependencies]
+python = "^3.6"
+protobuf = "^3.17.3"
+
+[tool.poetry.dev-dependencies]
+pylint = "^2.9.6"
+Sphinx = "^4.1.2"
+sphinx-rtd-theme = "^0.5.2"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

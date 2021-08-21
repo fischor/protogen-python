@@ -1,0 +1,27 @@
+# Generated code output.
+
+dependencies:
+- name: google/api/http.proto
+  num_dependencies: 0
+  num_messages: 3
+  num_enums: 0
+  num_services: 0
+  num_extensions: 0
+- name: google/protobuf/descriptor.proto
+  num_dependencies: 0
+  num_messages: 27
+  num_enums: 6
+  num_services: 0
+  num_extensions: 0
+
+messages:
+
+enums:
+
+services:
+
+extensions:
+- name: google.api.http
+  extendee:google.protobuf.MethodOptions
+  message: google.api.HttpRule
+  enum: None

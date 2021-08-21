@@ -1,0 +1,70 @@
+load("@rules_proto//proto:defs.bzl", "proto_library")
+load("//build/proto:compile.bzl", "proto_compile")
+load("@npm//typescript:index.bzl", "tsc")
+load("@build_bazel_rules_nodejs//:index.bzl", "js_library")
+
+proto_library(
+    name = "api_proto",
+    srcs = [
+        "annotations.proto",
+        "http.proto",
+        "httpbody.proto",
+    ],
+    strip_import_prefix = "/opensource/protogen/vendor",
+    visibility = ["//visibility:public"],
+    deps = [
+        "@com_google_protobuf//:any_proto",
+        "@com_google_protobuf//:descriptor_proto",
+    ],
+)
+
+# This generated code is supposed to
+# - used by the code generator.
+# - used by code that uses this annotation. --> the ts code will not need to import it
+# Thus this code is only used in the code generator itself.
+proto_compile(
+    name = "api_ts_proto.ts",
+    options = [
+        "protogen_import_resolver=google-protobuf",
+    ],
+    plugin = "//opensource/protogen/scripts:protoc-gen-ts",
+    prefix = "opensource/protogen/vendor",
+    proto = ":api_proto",
+    suffix = "_pb.ts",
+    visibility = ["//visibility:public"],
+)
+
+tsc(
+    name = "_api_ts_proto",
+    outs = [f + ext for ext in [
+        "_pb.js",
+        "_pb.d.ts",
+    ] for f in [
+        "annotations",
+        "http",
+        "httpbody",
+    ]],
+    args = [
+        "-p",
+        "$(execpath //opensource/protogen:tsconfig.json)",
+        "--outDir",
+        # $(RULEDIR) is a shorthand for the dist/bin directory where Bazel requires we write outputs
+        "$(RULEDIR)",
+    ],
+    data = [
+        ":api_ts_proto.ts",
+        "//opensource/protogen:tsconfig.json",
+        "@npm//@types/google-protobuf",
+        "@npm//@types/node",  # since "types": ["node"] is specified in tsconfig
+    ],
+    visibility = ["//visibility:public"],
+)
+
+js_library(
+    name = "api_ts_proto",
+    srcs = [":_api_ts_proto"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "@npm//google-protobuf",
+    ],
+)
