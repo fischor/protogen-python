@@ -1,4 +1,7 @@
-import keyword
+# Contents of this file are copied from the Github project
+# https://github.com/danielgtaylor/python-betterproto that 
+# is licensed under MIT License.
+
 import re
 
 # Word delimiters and symbols that will not be preserved when re-casing.
