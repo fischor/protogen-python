@@ -74,20 +74,19 @@ import google.protobuf.compiler.plugin_pb2
 import protogen._case
 
 
-class Registry():
-    """Registry for protogen types.
+class Registry:
+    """Registry for protogen types."""
 
-    """
     def __init__(self):
-        self._services_by_name: Dict[str, 'Service'] = {}
-        self._messages_by_name: Dict[str, 'Message'] = {}
-        self._enums_by_name: Dict[str, 'Enum'] = {}
-        self._files_by_name: Dict[str, 'File'] = {}
+        self._services_by_name: Dict[str, "Service"] = {}
+        self._messages_by_name: Dict[str, "Message"] = {}
+        self._enums_by_name: Dict[str, "Enum"] = {}
+        self._files_by_name: Dict[str, "File"] = {}
 
-    def _register_file(self, file: 'File'):
+    def _register_file(self, file: "File"):
         self._files_by_name[file.proto.name] = file
 
-    def _register_service(self, service: 'Service'):
+    def _register_service(self, service: "Service"):
         """Register a service.
 
         Args:
@@ -95,7 +94,7 @@ class Registry():
         """
         self._services_by_name[service.full_name] = service
 
-    def _register_message(self, message: 'Message'):
+    def _register_message(self, message: "Message"):
         """Register a message.
 
         Args:
@@ -103,7 +102,7 @@ class Registry():
         """
         self._messages_by_name[message.full_name] = message
 
-    def _register_enum(self, enum: 'Enum'):
+    def _register_enum(self, enum: "Enum"):
         """Register an Enum.
 
         Args:
@@ -111,45 +110,44 @@ class Registry():
         """
         self._enums_by_name[enum.full_name] = enum
 
-    def file_by_name(self, name: str) -> Optional['File']:
+    def file_by_name(self, name: str) -> Optional["File"]:
         if name not in self._files_by_name:
             return None
         return self._files_by_name[name]
 
-    def service_by_name(self, name: str) -> Optional['Service']:
+    def service_by_name(self, name: str) -> Optional["Service"]:
         if name not in self._services_by_name:
             return None
         return self._services_by_name[name]
 
-    def message_by_name(self, name: str) -> Optional['Message']:
-        """Resolve a message. C++ scoping rules apply if name doesnt start with a \".\".
-        """
+    def message_by_name(self, name: str) -> Optional["Message"]:
+        """Resolve a message. C++ scoping rules apply if name doesnt start with a \".\"."""
         if name not in self._messages_by_name:
             return None
         return self._messages_by_name[name]
 
-    def enum_by_name(self, name: str) -> Optional['Enum']:
+    def enum_by_name(self, name: str) -> Optional["Enum"]:
         if name not in self._enums_by_name:
             return None
         return self._enums_by_name[name]
 
-    def all_files(self) -> List['File']:
+    def all_files(self) -> List["File"]:
         """Get all files provided in the protoc request."""
         return list(self._files_by_name.values())
 
-    def all_services(self) -> List['Service']:
+    def all_services(self) -> List["Service"]:
         """Get all services provided in the protoc request."""
         return list(self._services_by_name.values())
 
-    def all_messages(self) -> List['Message']:
+    def all_messages(self) -> List["Message"]:
         """Get all messages provided in the protoc request."""
         return list(self._messages_by_name.values())
 
-    def all_enums(self) -> List['Enum']:
+    def all_enums(self) -> List["Enum"]:
         """Get all enums provided in the protoc request."""
         return list(self._enums_by_name.values())
 
-    def files_by_package(self, package: str) -> List['File']:
+    def files_by_package(self, package: str) -> List["File"]:
         """Get files by proto package"""
         files = []
         for file in self._files_by_name.values():
@@ -157,7 +155,7 @@ class Registry():
                 files.append(file)
         return files
 
-    def services_by_package(self, package: str) -> List['Service']:
+    def services_by_package(self, package: str) -> List["Service"]:
         """Get services by proto package"""
         services = []
         for service in self._services_by_name.values():
@@ -165,7 +163,9 @@ class Registry():
                 services.append(service)
         return services
 
-    def messages_by_package(self, package: str, top_level_only=False) -> List['Message']:
+    def messages_by_package(
+        self, package: str, top_level_only=False
+    ) -> List["Message"]:
         """Get messages by proto package."""
         messages = []
         for message in self._messages_by_name.values():
@@ -174,7 +174,7 @@ class Registry():
                 messages.append(message)
         return messages
 
-    def enums_by_package(self, package: str, top_level_only=False) -> List['Enum']:
+    def enums_by_package(self, package: str, top_level_only=False) -> List["Enum"]:
         """Get enums by proto package."""
         enums = []
         for enum in self._enums_by_name.values():
@@ -184,8 +184,9 @@ class Registry():
         return enums
 
 
-def _resolve_enum_type_name(registry: Registry, ref: str,
-                            type_name: str) -> Optional['Enum']:
+def _resolve_enum_type_name(
+    registry: Registry, ref: str, type_name: str
+) -> Optional["Enum"]:
     """Find a enum in the registry.
 
     Intended to be used to resolve `FieldDescriptorProto.type_name`.
@@ -195,13 +196,14 @@ def _resolve_enum_type_name(registry: Registry, ref: str,
     return Exception("resolve without dot notation not implemented yet")
 
 
-def _resolve_message_type_name(registry: Registry, ref: str,
-                               type_name: str) -> Optional['Message']:
+def _resolve_message_type_name(
+    registry: Registry, ref: str, type_name: str
+) -> Optional["Message"]:
     """Resolve a type_name.
 
     Intended to be used to resolve `FieldDescriptorProto.type_name`.
     `MethodDescriptorProto.input_type` and `MethodDescriptorProto-output_type`.
-    To resolve this, several 
+    To resolve this, several
     """
     if type_name.startswith("."):
         return registry.message_by_name(type_name[1:])
@@ -222,9 +224,14 @@ def _clean_comment(cmmt: str) -> str:
 
 # TODO maybe dataclass
 class Location:
-    def __init__(self, source_file: str, path: List[int],
-                 leading_detached_comments: List[str], leading_comments: str,
-                 trailing_comments: str):
+    def __init__(
+        self,
+        source_file: str,
+        path: List[int],
+        leading_detached_comments: List[str],
+        leading_comments: str,
+        trailing_comments: str,
+    ):
         self.source_file = source_file
         self.path = path
         self.leading_detached_comments = [
@@ -234,12 +241,13 @@ class Location:
         self.trailing_comments = _clean_comment(trailing_comments)
 
 
-def _resolve_location(file: google.protobuf.descriptor_pb2.FileDescriptorProto,
-                      path: List[int]) -> Location:
+def _resolve_location(
+    file: google.protobuf.descriptor_pb2.FileDescriptorProto, path: List[int]
+) -> Location:
     """Resolve location information for a path.
 
     Args:
-        file (google.protobuf.descriptor_pb2.FileDescriptorProto): 
+        file (google.protobuf.descriptor_pb2.FileDescriptorProto):
             The file descriptor.
         path (List[number]):
             Path to resolve the location information for.
@@ -252,21 +260,23 @@ def _resolve_location(file: google.protobuf.descriptor_pb2.FileDescriptorProto,
         # location_pb.path is a RepeatedScalarFieldContainer, that implements __eq__
         # and compares again its inner _values (list(int)) to the other argument.
         if location_pb.path == path:
-            return Location(file.name, path,
-                            location_pb.leading_detached_comments,
-                            location_pb.leading_comments,
-                            location_pb.trailing_comments)
+            return Location(
+                file.name,
+                path,
+                location_pb.leading_detached_comments,
+                location_pb.leading_comments,
+                location_pb.trailing_comments,
+            )
     return Location(file.name, path, [], "", "")
 
 
 # Note: The ImportPath class only makes sense if one follows the one proto file = one
 # python file schema.
 class PyImportPath:
-
     def __init__(self, path: str):
         self._path = path
 
-    def ident(self, name: str) -> 'PyIdent':
+    def ident(self, name: str) -> "PyIdent":
         """Create `PyIdent` with `self` as import path and name as `py_name`."""
         return PyIdent(self, name)
 
@@ -277,6 +287,7 @@ class PyImportPath:
 
     def __hash__(self) -> int:
         return hash(self._path)
+
 
 def _is_reserved_name(value: str) -> bool:
     if keyword.iskeyword(value):
@@ -304,6 +315,7 @@ class PyIdent:
         py_name (str): Python identfier name. Is going to be sanitized
             automatically.
     """
+
     def __init__(self, py_import_path: PyImportPath, py_name: str):
         self.py_import_path = py_import_path
         self.py_name = _sanitize_name(py_name)
@@ -348,22 +360,25 @@ class EnumValue:
             somewhat special.
         number (int): Enum number.
         parent (Enum): Enum the value is declared in.
-        location (Location): Location information associated with this enum value within 
+        location (Location): Location information associated with this enum value within
             the enum values parent file.
     """
+
     def __init__(
         self,
         proto: google.protobuf.descriptor_pb2.EnumValueDescriptorProto,
-        parent: 'Enum',
+        parent: "Enum",
         path: List[int],
     ):
         self.proto = proto
         # The Python identifier for a enum value is TODO
         self.py_ident = parent.py_ident.py_import_path.ident(
-            parent.py_ident.py_name + "." + proto.name)
+            parent.py_ident.py_name + "." + proto.name
+        )
         self.number = self.proto.number
         self.parent = parent
         self.location = _resolve_location(parent.parent_file.proto, path)
+
 
 class Enum:
     """Enum is a protobuf enum.
@@ -374,22 +389,23 @@ class Enum:
         full_name (str): Full proto name of the enum.
         parent_file (File): File the enum is declared in.
         parent (Optional[Message]): For nested enums, the message the enum is declared in,
-            None otherwise. 
-            > All other proto declarations are in the namespace of the parent. 
-            > However, enum values do not follow this rule and are within the 
-            > namespace of the parent's parent (i.e., they are a sibling of the 
-            > containing enum). Thus, a value named "FOO_VALUE" declared within an 
-            > enum uniquely identified as "proto.package.MyEnum" has a full name of 
+            None otherwise.
+            > All other proto declarations are in the namespace of the parent.
+            > However, enum values do not follow this rule and are within the
+            > namespace of the parent's parent (i.e., they are a sibling of the
+            > containing enum). Thus, a value named "FOO_VALUE" declared within an
+            > enum uniquely identified as "proto.package.MyEnum" has a full name of
             > "proto.package.FOO_VALUE".
         values (List[EnumValue]): Values of the enum.
-        location (Location): Location information associated with this enum within 
+        location (Location): Location information associated with this enum within
             the enums parent file.
     """
+
     def __init__(
         self,
         proto: google.protobuf.descriptor_pb2.EnumDescriptorProto,
-        parent_file: 'File',
-        parent: Optional['Message'],
+        parent_file: "File",
+        parent: Optional["Message"],
         path: List[int],
     ):
         """Initializes a new Enum; do not use."""
@@ -400,7 +416,8 @@ class Enum:
         else:
             self.full_name = parent.full_name + "." + proto.name
             self.py_ident = parent.py_ident.py_import_path.ident(
-                parent.py_ident.py_name + "." + proto.name)
+                parent.py_ident.py_name + "." + proto.name
+            )
         self.parent_file = parent_file
         self.parent = parent
         self.location = _resolve_location(parent_file.proto, path)
@@ -408,15 +425,18 @@ class Enum:
         self.values: List[EnumValue] = []
         for i in range(len(proto.value)):
             value_path = path + [
-                2, i
+                2,
+                i,
             ]  # 2 is the field number for `value` in `EnumDescriptorProto`.
             self.values.append(EnumValue(proto.value[i], self, value_path))
 
 
 def _is_map(message: "Message") -> bool:
-    return message.proto.HasField(
-        'options') and message.proto.options.HasField('map_entry') and getattr(
-            message.proto.options, 'map_entry')
+    return (
+        message.proto.HasField("options")
+        and message.proto.options.HasField("map_entry")
+        and getattr(message.proto.options, "map_entry")
+    )
 
 
 class Field:
@@ -426,7 +446,7 @@ class Field:
         proto (google.protobuf.descriptor_pb2.FieldDescriptorProto): The raw proto descriptor.
         py_name (str): Python name of the field. Same as proto.name typically.
         full_name (str): Full proto name of the field.
-        parent (Optional[Message]): The message the field in declared in. None for 
+        parent (Optional[Message]): The message the field in declared in. None for
             top-level extensions.
         parent_file (File): The File the field is declared in.
         oneof (Optional[OneOf]): Containing oneof; None if not part of a oneof
@@ -435,15 +455,16 @@ class Field:
         extendee (Optional[Message]): Extendee for extension fields, None otherwise.
         enum (Optional[Enum]): If kind is enum, this is the enum type.
         message (Optiona[Message]): If kind is message, this is the message type.
-        location (Location): Location information associated with this field within 
+        location (Location): Location information associated with this field within
             the fields parent file.
     """
+
     def __init__(
         self,
         proto: google.protobuf.descriptor_pb2.FieldDescriptorProto,
-        parent: Optional['Message'],
-        parent_file: 'File',
-        oneof: Optional['OneOf'],
+        parent: Optional["Message"],
+        parent_file: "File",
+        oneof: Optional["OneOf"],
         path: List[int],
     ):
         self.proto = proto
@@ -459,8 +480,8 @@ class Field:
         self.kind = Kind(proto.type)  # type V is builtin.int
         self.cardinality = Cardinality(proto.label)  # type V is builtin.int
         self.location = _resolve_location(parent_file.proto, path)
-        self.message: Optional['Message'] = None
-        self.enum: Optional['Enum'] = None
+        self.message: Optional["Message"] = None
+        self.enum: Optional["Enum"] = None
 
     def is_map(self) -> bool:
         if self.message is None:
@@ -470,22 +491,22 @@ class Field:
     def is_list(self) -> bool:
         return self.cardinality == Cardinality.REPEATED and not self.is_map()
 
-    def map_key(self) -> Optional['Field']:
+    def map_key(self) -> Optional["Field"]:
         if not self.is_map():
             return None
         return self.message.fields[0]
 
-    def map_value(self) -> Optional['Field']:
+    def map_value(self) -> Optional["Field"]:
         if not self.is_map():
             return None
         return self.message.fields[1]
 
     def _resolve(self, registry: Registry):
         # resolve extendee is present
-        if self.proto.HasField('extendee'):
-            self.extendee = _resolve_message_type_name(registry,
-                                                       self.full_name,
-                                                       self.proto.extendee)
+        if self.proto.HasField("extendee"):
+            self.extendee = _resolve_message_type_name(
+                registry, self.full_name, self.proto.extendee
+            )
             if self.extendee is None:
                 raise ResolutionError(
                     file=self.parent_file.proto.name,
@@ -495,12 +516,14 @@ class Field:
 
         # resolve the enum
         if self.kind == Kind.ENUM:
-            if not self.proto.HasField('type_name'):
+            if not self.proto.HasField("type_name"):
                 raise InvalidDescriptorError(
                     full_name=self.full_name,
-                    msg="is of kind ENUM but has no `type_name` set")
-            self.enum = _resolve_enum_type_name(registry, self.full_name,
-                                                self.proto.type_name)
+                    msg="is of kind ENUM but has no `type_name` set",
+                )
+            self.enum = _resolve_enum_type_name(
+                registry, self.full_name, self.proto.type_name
+            )
             if not self.enum:
                 raise ResolutionError(
                     file=self.parent_file.proto.name,
@@ -512,12 +535,14 @@ class Field:
         # doe maps have a Kind.GROUP set? Might also be that maps have
         # the value kind as kind set.
         if self.kind == Kind.MESSAGE:
-            if not self.proto.HasField('type_name'):
+            if not self.proto.HasField("type_name"):
                 raise InvalidDescriptorError(
                     full_name=self.full_name,
-                    msg="is of kind MESSAGE but has no `type_name` set")
-            self.message = _resolve_message_type_name(registry, self.full_name,
-                                                      self.proto.type_name)
+                    msg="is of kind MESSAGE but has no `type_name` set",
+                )
+            self.message = _resolve_message_type_name(
+                registry, self.full_name, self.proto.type_name
+            )
             if self.message is None:
                 raise ResolutionError(
                     file=self.parent_file.proto.name,
@@ -544,12 +569,16 @@ class OneOf:
         full_name (str): Full proto name of the oneof.
         parent (Message): Message the oneof is declared in.
         fields (List[Field]): Fields that are part of this oneof.
-        location (Location): Location information associated with this message within 
+        location (Location): Location information associated with this message within
             the messages parent file.
     """
-    def __init__(self,
-                 proto: google.protobuf.descriptor_pb2.OneofDescriptorProto,
-                 parent: 'Message', path: List[int]):
+
+    def __init__(
+        self,
+        proto: google.protobuf.descriptor_pb2.OneofDescriptorProto,
+        parent: "Message",
+        path: List[int],
+    ):
         self.proto = proto
         self.full_name = parent.full_name + "." + proto.name
         self.parent = parent
@@ -577,12 +606,17 @@ class Message:
         enums (List[Enum]): Nested enum declarations.
         messages (List[Message]): Nested message declarations.
         extensions (ListExtension): Nested extension declations.
-        location (Location): Location information associated with this message within 
+        location (Location): Location information associated with this message within
             the messages parent file.
     """
-    def __init__(self, proto: google.protobuf.descriptor_pb2.DescriptorProto,
-                 parent_file: 'File', parent: Optional['Message'],
-                 path: List[int]):
+
+    def __init__(
+        self,
+        proto: google.protobuf.descriptor_pb2.DescriptorProto,
+        parent_file: "File",
+        parent: Optional["Message"],
+        path: List[int],
+    ):
         """Initialize a new Message.
 
         Args:
@@ -592,7 +626,8 @@ class Message:
         """
         self.proto = proto
         self.py_ident = parent_file.py_import_path.ident(
-            self.proto.name)  # TODO how to handle nested messages?
+            self.proto.name
+        )  # TODO how to handle nested messages?
         if parent is not None:
             self.full_name = parent.full_name + "." + proto.name
         else:
@@ -605,7 +640,8 @@ class Message:
         self.oneofs: List[OneOf] = []
         for i in range(len(proto.oneof_decl)):
             oneof_path = path + [
-                8, i
+                8,
+                i,
             ]  # 8 is the number of oneof_decl in MessageDescriptorProto.
             oneof = OneOf(proto.oneof_decl[i], self, oneof_path)
             self.oneofs.append(oneof)
@@ -614,36 +650,41 @@ class Message:
         self.fields: List[Field] = []
         for i in range(len(proto.field)):
             field_path = path + [
-                2, i
+                2,
+                i,
             ]  # 2 is the number of field in MessageDescriptorProto.
             # In case that field belongs to a oneof, initialize it with that oneof.
             # The `oneof_index` indicates to which oneof the field belongs.
-            if proto.field[i].HasField('oneof_index'):
-                field = Field(proto.field[i], self, parent_file,
-                              self.oneofs[proto.field[i].oneof_index],
-                              field_path)
+            if proto.field[i].HasField("oneof_index"):
+                field = Field(
+                    proto.field[i],
+                    self,
+                    parent_file,
+                    self.oneofs[proto.field[i].oneof_index],
+                    field_path,
+                )
                 self.oneofs[proto.field[i].oneof_index].fields.append(field)
                 self.fields.append(field)
             else:
-                field = Field(proto.field[i], self, parent_file, None,
-                              field_path)
+                field = Field(proto.field[i], self, parent_file, None, field_path)
                 self.fields.append(field)
 
         # Initialize nested Messages.
         self.messages: List[Message] = []
         for i in range(len(proto.nested_type)):
             message_path = path + [
-                3, i
+                3,
+                i,
             ]  # 3 is the number of nested_type in MessageDescriptorProto.
-            message = Message(proto.nested_type[i], parent_file, self,
-                              message_path)
+            message = Message(proto.nested_type[i], parent_file, self, message_path)
             self.messages.append(message)
 
         # Initialize nested Enums.
         self.enums: List[Enum] = []
         for i in range(len(proto.enum_type)):
             enum_path = path + [
-                4, i
+                4,
+                i,
             ]  # 3 is the number of enum_type in MessageDescriptorProto.
             enum = Enum(proto.enum_type[i], parent_file, self, enum_path)
             self.enums.append(enum)
@@ -652,10 +693,12 @@ class Message:
         self.extension: List[Extension] = []
         for i in range(len(proto.extension)):
             extension_path = path + [
-                6, i
+                6,
+                i,
             ]  # 6 is the number of extension in MessageDescriptorProto.
-            extension = Field(proto.extension[i], self, parent_file, None,
-                              extension_path)
+            extension = Field(
+                proto.extension[i], self, parent_file, None, extension_path
+            )
             self.extension.append(extension)
 
     def _register(self, registry: Registry):
@@ -674,18 +717,19 @@ class Message:
             field._resolve(registry)
         for extension in self.extension:
             extension._resolve(registry)
-        
-        # Remove autogenerated messages from the list of
-        # nested message. Typically, no code shpuld be generated
-        # for these. 
+
+        # Remove autogenerated messages from the list of nested message.
+        # Typically, no code should be generated for these.
         # TODO maybe make this configurable
         cleaned_messages = []
         for message in self.messages:
-            if message.proto.options.HasField("map_entry") and message.proto.options.map_entry:
+            if (
+                message.proto.options.HasField("map_entry")
+                and message.proto.options.map_entry
+            ):
                 continue
             cleaned_messages.append(message)
         self.messages = cleaned_messages
-
 
 
 class ResolutionError(Exception):
@@ -696,8 +740,9 @@ class ResolutionError(Exception):
         ref (str): reference
         msg_enum_or_service (str): what looking for
     """
+
     def __init__(self, file: str, ref: str, type_name: str):
-        msg = f"({file}: Failed to resolve \"{type_name}\" from \"{ref}\"."
+        msg = f'({file}: Failed to resolve "{type_name}" from "{ref}".'
         super().__init__(msg)
         self.file = file
         self.ref = ref
@@ -710,6 +755,7 @@ class InvalidDescriptorError(Exception):
     E.g. if a FieldDescriptors Kind is enum or message but no type_name is set.
     Or if a location is specified that can not be found.
     """
+
     def __init__(self, full_name: str, msg: str):
         super().__init__(f"invalid descriptor error ({full_name}): {msg}")
 
@@ -724,9 +770,13 @@ class Method:
         grpc_path (str): grpc path
         parent (Service): The Service the method belongs to.
     """
-    def __init__(self,
-                 proto: google.protobuf.descriptor_pb2.MethodDescriptorProto,
-                 parent: 'Service', path: List[int]):
+
+    def __init__(
+        self,
+        proto: google.protobuf.descriptor_pb2.MethodDescriptorProto,
+        parent: "Service",
+        path: List[int],
+    ):
         self.proto = proto
         self.py_name = protogen._case.snake_case(proto.name)
         self.full_name = parent.full_name + "." + proto.name
@@ -737,16 +787,18 @@ class Method:
         self.location = _resolve_location(parent.parent_file.proto, path)
 
     def _resolve(self, registry: Registry):
-        self.input = _resolve_message_type_name(registry, self.full_name,
-                                                self.proto.input_type)
+        self.input = _resolve_message_type_name(
+            registry, self.full_name, self.proto.input_type
+        )
         if self.input is None:
             raise ResolutionError(
                 file=self.parent.parent_file.proto.name,
                 ref=self.full_name,
                 type_name=self.proto.input_type,
             )
-        self.output = _resolve_message_type_name(registry, self.full_name,
-                                                 self.proto.output_type)
+        self.output = _resolve_message_type_name(
+            registry, self.full_name, self.proto.output_type
+        )
         if self.output is None:
             raise ResolutionError(
                 file=self.parent.parent_file.proto.name,
@@ -768,9 +820,13 @@ class Service:
         methods (List[Method]): Service method declarations.
         location (Location): Comments associated with this service.
     """
-    def __init__(self,
-                 proto: google.protobuf.descriptor_pb2.ServiceDescriptorProto,
-                 parent: 'File', path: List[int]):
+
+    def __init__(
+        self,
+        proto: google.protobuf.descriptor_pb2.ServiceDescriptorProto,
+        parent: "File",
+        path: List[int],
+    ):
         self.proto = proto
         self.py_ident = parent.py_import_path.ident(proto.name)
         self.full_name = parent.proto.package + "." + proto.name
@@ -801,7 +857,7 @@ class File:
         proto (google.protobuf.descriptor_pb2.FileDescriptorProto): The raw proto descriptor.
         generated_filename_prefix (str): Name of the original proto file (without `.proto` extension).
         py_package_name (str): Name of the proto package the file belongs to. This is
-            the result of the proto package name of the proto file applied to the 
+            the result of the proto package name of the proto file applied to the
             `py_import_function` of the `Plugin` that is used to read this file.
         py_import_path (ImportPath): Import path for this file. Uses the `python_package_name`
             as package.
@@ -814,11 +870,13 @@ class File:
         extensions (list(Extension)): Top-level extension declarations.
         options (list(Field)): options defined for this file
     """
-    def __init__(self,
-                 proto: google.protobuf.descriptor_pb2.FileDescriptorProto,
-                 generate: bool,
-                 py_import_func: Callable[[str], str],
-                 ):
+
+    def __init__(
+        self,
+        proto: google.protobuf.descriptor_pb2.FileDescriptorProto,
+        generate: bool,
+        py_import_func: Callable[[str], str],
+    ):
         """Creates a new file.
 
         Args:
@@ -828,7 +886,7 @@ class File:
                 Message factory to re-parse options.
         """
         self.proto = proto
-        self.generated_filename_prefix = proto.name[:-len(".proto")]
+        self.generated_filename_prefix = proto.name[: -len(".proto")]
         # The actual pyton path is determined using the py_import_func.
         # TODO maybe require the rewrite func to return a Python file and
         # then generate the import path from that python filename
@@ -840,7 +898,8 @@ class File:
         self.messages: List[Message] = []
         for i in range(len(proto.message_type)):
             path = [
-                4, i
+                4,
+                i,
             ]  # 4 is the number of the message_type in the FileDescriptorProto.
             message = Message(proto.message_type[i], self, None, path)
             self.messages.append(message)
@@ -848,35 +907,26 @@ class File:
         self.enums: List[Enum] = []
         for i in range(len(proto.enum_type)):
             path = [
-                5, i
+                5,
+                i,
             ]  # 5 is the number of the enum_type in the FileDescriptorProto.
             enum = Enum(proto.enum_type[i], self, None, path)
             self.enums.append(enum)
 
         self.services: List[Service] = []
         for i in range(len(proto.service)):
-            path = [
-                6, i
-            ]  # 6 is the number of the service in the FileDescriptorProto.
+            path = [6, i]  # 6 is the number of the service in the FileDescriptorProto.
             service = Service(proto.service[i], self, path)
             self.services.append(service)
 
         self.extensions: List[Extension] = []
         for i in range(len(proto.extension)):
             path = [
-                7, i
+                7,
+                i,
             ]  # 7 is the number of the extension in the FileDescriptorProto.
             extension = Extension(proto.extension[i], None, self, None, path)
             self.extensions.append(extension)
-
-        #
-        # file_opts = proto.options
-        # if descriptorpb_messages is not None:
-        #     _file_opts = descriptorpb_messages["google.protobuf.FileOptions"]
-        #     _file_opts.ParseFromString(proto.options.SerializeToString())
-        #     file_opts = _file_opts
-        # for opt in file_opts.ListFields():
-        #     pass
 
     def _register(self, registry: Registry):
         """Register the file, all messages, enums and services on the registry."""
@@ -927,16 +977,16 @@ class GeneratedFile:
         for message in f.messages:
             g.P("class", message.py_ident.name, "():")
             g.P("    pass")
-    
+
     The generated file handles imports for you when using the ``P`` and ``qualified_py_ident``
-    methods. See ``qualified_py_ident`` for how this works. 
+    methods. See ``qualified_py_ident`` for how this works.
     Use `g.print_imports()` to specify where the imports should occur in the generated file.
     See TODO ``<link-to-example>`` for a more in depth example of import handling
     """
 
     def __init__(
-        self, 
-        name: str, 
+        self,
+        name: str,
         py_import_path: PyImportPath,
     ):
         """Create an empty file with a specified name. Use `Plugin.new_generated_file` instead."""
@@ -944,8 +994,8 @@ class GeneratedFile:
         self._py_import_path = py_import_path
         self._buf: List[str] = []
         self._import_mark = -1
-        # Set of imports. Will be rewritten using the py_import_func before added
-        # to the set.
+        # Set of imports. Will be rewritten using the py_import_func before
+        # added to the set.
         self._imports: Set[PyImportPath] = set()
         self._indent = 0
 
@@ -959,8 +1009,9 @@ class GeneratedFile:
     def P(self, *args):
         """Print a line to the generated output.
 
-        Each item is converted to a string. PyIdents are handeled specially: it's imports are
-        added automatically to the import list of the GeneratedFile.
+        Each item is converted to a string. PyIdents are handeled specially:
+        it's imports are added automatically to the import list of the
+        GeneratedFile.
 
         Args:
             *args: Items on that line.
@@ -989,13 +1040,13 @@ class GeneratedFile:
     def print_import(self):
         self._import_mark = len(self._buf)
 
-    def _proto(
-        self
-    ) -> google.protobuf.compiler.plugin_pb2.CodeGeneratorResponse.File:
+    def _proto(self) -> google.protobuf.compiler.plugin_pb2.CodeGeneratorResponse.File:
         if self._import_mark > -1:
-            lines = self._buf[:self._import_mark] + [
-                f"import {p._path}" for p in self._imports
-            ] + self._buf[self._import_mark:]
+            lines = (
+                self._buf[: self._import_mark]
+                + [f"import {p._path}" for p in self._imports]
+                + self._buf[self._import_mark :]
+            )
         else:
             lines = self._buf
         content = "\n".join(lines)
@@ -1005,22 +1056,25 @@ class GeneratedFile:
             content=content,
         )
 
-class Plugin():
+
+class Plugin:
     """A protoc plugin invocation.
 
     Attributes:
-        parameter: (Dict[str, str]): Generator parameter passed to the plugin using `<plugin>_opt=<key>=<value>` or `<plugin>_out=<key>=<value>`
-        files_to_generate (List[File]): List of files to generate code for.
+        parameter: (Dict[str, str]): Generator parameter passed to the plugin
+            using `<plugin>_opt=<key>=<value>` or `<plugin>_out=<key>=<value>`
+            files_to_generate (List[File]): List of files to generate code for.
     """
+
     def __init__(
-            self,
-            parameter: Dict[str, str],
-            files_to_generate: List[File],
-        ):
+        self,
+        parameter: Dict[str, str],
+        files_to_generate: List[File],
+    ):
         """Create a new protoc plugin.
 
-        This __init__ method is intended to only be used internally in the 
-        resolution process. Do not use it in plugins directly. Instead, use 
+        This __init__ method is intended to only be used internally in the
+        resolution process. Do not use it in plugins directly. Instead, use
         the `Options.run` method to run plugin.
 
         Args:
@@ -1041,8 +1095,9 @@ class Plugin():
             response.file.append(f._proto())
         return response
 
-    def new_generated_file(self, name: str,
-                           py_import_path: PyImportPath) -> GeneratedFile:
+    def new_generated_file(
+        self, name: str, py_import_path: PyImportPath
+    ) -> GeneratedFile:
         """Create a new generated file.
 
         The generated file will be added to automatically to the plugin output.
@@ -1051,7 +1106,7 @@ class Plugin():
         Args:
             name (str): Name of the generated file. Relative to.
             py_import_path (PyImportPath): Python import path of the new generated file.
-                This is used to decide wheter to print the fully qualified name or the 
+                This is used to decide wheter to print the fully qualified name or the
                 simply name for a python identifier when using `GeneratedFile.P`.
         """
         g = GeneratedFile(name, py_import_path)
@@ -1071,6 +1126,7 @@ class Plugin():
         if self._error is None:
             self._error = msg
 
+
 def default_py_import_func(filename: str, package: str) -> str:
     """The default `py_import_func`. See Options.__init__.
 
@@ -1083,7 +1139,8 @@ def default_py_import_func(filename: str, package: str) -> str:
     """
     return filename.replace(".proto", "_pb2").replace("/", ".")
 
-class Options():
+
+class Options:
     def __init__(
         self,
         *,
@@ -1094,7 +1151,7 @@ class Options():
         """Create options for the resolution process.
 
         Args:
-            py_import_func: Defines how to derive `PyImportPaths` in the resolution 
+            py_import_func: Defines how to derive `PyImportPaths` in the resolution
                 process.
         """
         self._input = input
@@ -1104,19 +1161,20 @@ class Options():
     def run(self, f: Callable[[Plugin], None]):
         """Run a code generation function."""
         req = google.protobuf.compiler.plugin_pb2.CodeGeneratorRequest.FromString(
-            self._input.read())
+            self._input.read()
+        )
 
         # Parse parameters. These are given as flags to protoc:
-        # 
+        #
         #   --plugin_opt=key1=value1
         #   --plugin_opt=key2=value2,key3=value3
         #   --plugin_opt=key4,,,
         #   --plugin_opt=key5:novalue5
         #   --plugin_out=key6:./path
         #
-        # Multiple in one protoc call are possible. All `plugin_opt`s 
-        # are joined with a "," in the CodeGeneratorRequest. The equal 
-        # sign actually has no special meaning, its just a convention.
+        # Multiple in one protoc call are possible. All `plugin_opt`s are joined
+        # with a "," in the CodeGeneratorRequest. The equal sign actually has no
+        # special meaning, its just a convention.
         #
         # The above would result in a parameter string of
         #
@@ -1124,24 +1182,23 @@ class Options():
         #
         # (ignoring the order).
         #
-        # Follow the convention of parameters pairs separated by commans in
-        # the form {k}={v}. If {k} (without value), write an empty string
-        # to the parameter dict. For {k}={v}={v2} write {k} and key and 
-        # {v}={v2} as value.
+        # Follow the convention of parameters pairs separated by commans in the
+        # form {k}={v}. If {k} (without value), write an empty string to the
+        # parameter dict. For {k}={v}={v2} write {k} and key and {v}={v2} as
+        # value.
         parameter: Dict[str, str] = {}
         for param in req.parameter.split(","):
             if param == "":
                 # Ignore empty parameters.
                 continue
-            splits = param.split("=", 1) # maximum one split
+            splits = param.split("=", 1)  # maximum one split
             if len(splits) == 1:
                 k, v = splits[0], ""
-            else: 
+            else:
                 k, v = splits
             parameter[k] = v
 
-        # Resolve raw proto descriptors to their corresponding 
-        # protogen classes.
+        # Resolve raw proto descriptors to their corresponding protogen classes.
         registry = Registry()
         files_to_generate: List[File] = []
         for proto in req.proto_file:

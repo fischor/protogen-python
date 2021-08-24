@@ -1,5 +1,5 @@
 # Contents of this file are copied from the Github project
-# https://github.com/danielgtaylor/python-betterproto that 
+# https://github.com/danielgtaylor/python-betterproto that
 # is licensed under MIT License.
 
 import re
@@ -31,6 +31,7 @@ def snake_case(value: str, strict: bool = True) -> str:
     :class:`str`
         The value in snake_case.
     """
+
     def substitute_word(symbols: str, word: str, is_start: bool) -> str:
         if not word:
             return ""
@@ -40,17 +41,16 @@ def snake_case(value: str, strict: bool = True) -> str:
             delimiter_count = len(symbols)
         elif word.isupper() or word.islower():
             delimiter_count = max(
-                1, len(symbols))  # Preserve all delimiters if not strict.
+                1, len(symbols)
+            )  # Preserve all delimiters if not strict.
         else:
-            delimiter_count = len(
-                symbols) + 1  # Extra underscore for leading capital.
+            delimiter_count = len(symbols) + 1  # Extra underscore for leading capital.
 
         return ("_" * delimiter_count) + word.lower()
 
     snake = re.sub(
         f"(^)?({SYMBOLS})({WORD_UPPER}|{WORD})",
-        lambda groups: substitute_word(groups[2], groups[3], groups[1] is
-                                       not None),
+        lambda groups: substitute_word(groups[2], groups[3], groups[1] is not None),
         value,
     )
     return snake
@@ -70,6 +70,7 @@ def pascal_case(value: str, strict: bool = True) -> str:
     :class:`str`
         The value in PascalCase.
     """
+
     def substitute_word(symbols, word):
         if strict:
             return word.capitalize()  # Remove all delimiters
