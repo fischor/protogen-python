@@ -22,6 +22,6 @@ services:
 
 extensions:
 - name: google.api.http
-  extendee:google.protobuf.MethodOptions
+  extendee: google.protobuf.MethodOptions
   message: google.api.HttpRule
   enum: None

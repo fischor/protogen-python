@@ -82,7 +82,7 @@ def generate_service(g: protogen.Service, s: protogen.Service):
 
 def generate_extensions(g: protogen.GeneratedFile, e: protogen.Extension):
     g.P("- name: ", e.full_name)
-    g.P("  extendee:", e.extendee.full_name)
+    g.P("  extendee: ", e.extendee.full_name)
     g.P("  message: ", "None" if not e.message else e.message.full_name)
     g.P("  enum: ",  "None" if not e.enum else e.enum.full_name)
 
