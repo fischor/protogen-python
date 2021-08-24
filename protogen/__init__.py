@@ -1014,8 +1014,8 @@ class Plugin():
     """
     def __init__(
             self,
-            request: google.protobuf.compiler.plugin_pb2.CodeGeneratorRequest,
-            py_import_func: Callable[[str], str],
+            parameter: Dict[str, str],
+            files_to_generate: List[File],
         ):
         """Create a new protoc plugin.
 
@@ -1026,30 +1026,10 @@ class Plugin():
         Args:
             req (plugin_pb2.CodeGeneratorRequest): Request read from protoc.
         """
-        self._error = None
-        self._py_import_func = py_import_func
+        self.parameter = parameter
+        self.files_to_generate = files_to_generate
 
-        # Parse parameters. These are written as --plugin_opt=key1=value1 -
-        # -plugin_opt=key2=value2 on the command line and passed as 
-        # "key1=value1,key2=value2" in the CodeGeneratorRequest.parameter.
-        self.parameter: Dict[str, str] = {}
-        for param in request.parameter.split(","):
-            # "".split(",") or "key=value,", will returns at least one "" param.
-            if param == "":
-                continue
-            k, v = param.split("=", 2)
-            self.parameter[k] = v
-
-        self.registry = Registry()
-        self.files_to_generate: List[File] = []
-        for proto in request.proto_file:
-            generate = proto.name in request.file_to_generate
-            file = File(proto, generate, self._py_import_func)
-            file._register(self.registry)
-            file._resolve(self.registry)
-            if generate:
-                self.files_to_generate.append(file)
-
+        self._error: Optional[str] = None
         self._generated_files: List[GeneratedFile] = []
 
     def _response(self) -> google.protobuf.compiler.plugin_pb2.CodeGeneratorResponse:
@@ -1126,7 +1106,33 @@ class Options():
         req = google.protobuf.compiler.plugin_pb2.CodeGeneratorRequest.FromString(
             self._input.read())
 
-        plugin = Plugin(req, self._py_import_func)
+        # Parse parameters. These are written as --plugin_opt=key1=value1 -
+        # -plugin_opt=key2=value2 on the command line and passed as 
+        # "key1=value1,key2=value2" in the CodeGeneratorRequest.parameter.
+        parameter: Dict[str, str] = {}
+        for param in req.parameter.split(","):
+            # "".split(",") or "key=value,", will returns at least one "" param.
+            if param == "":
+                continue
+            k, v = param.split("=", 2)
+            parameter[k] = v
+
+        # Resolve raw proto descriptors to their corresponding 
+        # protogen classes.
+        registry = Registry()
+        files_to_generate: List[File] = []
+        for proto in req.proto_file:
+            generate = proto.name in req.file_to_generate
+            file = File(proto, generate, self._py_import_func)
+            file._register(registry)
+            file._resolve(registry)
+            if generate:
+                files_to_generate.append(file)
+
+        # Create plugin and run the provided code generation function.
+        plugin = Plugin(parameter, files_to_generate)
         f(plugin)
+
+        # Write response.
         resp = plugin._response()
         self._output.write(resp.SerializeToString())
