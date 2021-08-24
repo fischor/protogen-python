@@ -1106,15 +1106,38 @@ class Options():
         req = google.protobuf.compiler.plugin_pb2.CodeGeneratorRequest.FromString(
             self._input.read())
 
-        # Parse parameters. These are written as --plugin_opt=key1=value1 -
-        # -plugin_opt=key2=value2 on the command line and passed as 
-        # "key1=value1,key2=value2" in the CodeGeneratorRequest.parameter.
+        # Parse parameters. These are given as flags to protoc:
+        # 
+        #   --plugin_opt=key1=value1
+        #   --plugin_opt=key2=value2,key3=value3
+        #   --plugin_opt=key4,,,
+        #   --plugin_opt=key5:novalue5
+        #   --plugin_out=key6:./path
+        #
+        # Multiple in one protoc call are possible. All `plugin_opt`s 
+        # are joined with a "," in the CodeGeneratorRequest. The equal 
+        # sign actually has no special meaning, its just a convention.
+        #
+        # The above would result in a parameter string of
+        #
+        #   "key1=value1,key2=value2,key3=value3,key4,,,,key5:novalue5,key6"
+        #
+        # (ignoring the order).
+        #
+        # Follow the convention of parameters pairs separated by commans in
+        # the form {k}={v}. If {k} (without value), write an empty string
+        # to the parameter dict. For {k}={v}={v2} write {k} and key and 
+        # {v}={v2} as value.
         parameter: Dict[str, str] = {}
         for param in req.parameter.split(","):
-            # "".split(",") or "key=value,", will returns at least one "" param.
             if param == "":
+                # Ignore empty parameters.
                 continue
-            k, v = param.split("=", 2)
+            splits = param.split("=", 1) # maximum one split
+            if len(splits) == 1:
+                k, v = splits[0], ""
+            else: 
+                k, v = splits
             parameter[k] = v
 
         # Resolve raw proto descriptors to their corresponding 
