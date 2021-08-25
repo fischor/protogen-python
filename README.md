@@ -1,5 +1,12 @@
 # `protogen`
 
+## What does this package provide for benefits
+
+Package `protogen` makes writing `protoc` plugins easier.
+Working with the raw `CodeGeneratorRequest` i.e. the raw Descriptor messages can be cumbersome.
+`protogen` resolves and links the Descriptors from the CodeGeneratorRequest i.e. turns them into their corresponding `protogen` classes that are easier to work with.
+It also provides mechanisms that are espacially useful to generate Python code by dealing with Python imports.
+
 ## Installation
 
  Package `protogen` is available via `pip`. To install run:
@@ -7,13 +14,6 @@
 ```
 pip install protogen
 ```
-
-## What does this package provide for benefits
-
-Package `protogen` makes writing `protoc` plugins easier.
-Working with the raw `CodeGeneratorRequest` i.e. the raw Descriptor messages can be cumbersome.
-`protogen` resolves and links the Descriptors from the CodeGeneratorRequest i.e. turns them into their corresponding `protogen` classes that are easier to work with.
-It also provides mechanisms that are espacially useful to generate Python code by dealing with Python imports.
 
 ## What is a protoc plugin anyway?
 
