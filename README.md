@@ -177,8 +177,8 @@ Caveats:
 
 # See also
 
-- if you want to write protoc plugins with JavaScript/TypeScript
-- if you want to write protoc plugins with Golang
+- if you want to write protoc plugins with JavaScript/TypeScript: [github.com/fischor/protogen-javascript](https://github.com/fischor/protogen-javascript)
+- if you want to write protoc plugins with Golang: [google.golang.org/protobuf/compiler/protogen](https://google.golang.org/protobuf/compiler/protogen)
 
 # Credits
 
