@@ -14,7 +14,15 @@ pylint = "^2.9.6"
 Sphinx = "^4.1.2"
 sphinx-rtd-theme = "^0.5.2"
 black = "^21.7b0"
+pydocstyle = "^6.1.1"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.pydocstyle]
+inherit = false
+convention = "numpy"
+add_select = "D212,D402,D415,D417"
+match_dir = "protogen"
+match = ".*\\.py"
