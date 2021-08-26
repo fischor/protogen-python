@@ -15,9 +15,9 @@ pip install protogen
 
 ## API
 
-`protogen` provides a bunch of classes. Most of them are simply replacements of their corresponding descriptors. E.g. `protogen.File` represents a `FileDescriptor`, `protogen.Message` a `MessageDescriptor` etc. They should be self explanatory. You can read their docstrings for more information about them.
+`protogen` provides a bunch of classes. Most of them are simply replacements of their corresponding descriptors. E.g. `protogen.File` represents a `FileDescriptor`, `protogen.Message` a `Descriptor`, `protogen.Field` a FieldDescriptor etc. They should be self explanatory. You can read their docstrings for more information about them.
 
-The classes `protogen.Options`, `protogen.Plugin` and `protogen.GeneratedFile` make up a framework to generate (Python) files.
+The classes `protogen.Options`, `protogen.Plugin` and `protogen.GeneratedFile` make up a framework to generate files.
 You can see these in action in the following example plugin:
 
 ```python
