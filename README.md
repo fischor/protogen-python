@@ -1,7 +1,5 @@
 # `protogen`
 
-## What does this package provide for benefits
-
 Package `protogen` makes writing `protoc` plugins easier.
 Working with the raw `CodeGeneratorRequest` i.e. the raw Descriptor messages can be cumbersome.
 `protogen` resolves and links the Descriptors from the CodeGeneratorRequest i.e. turns them into their corresponding `protogen` classes that are easier to work with.
@@ -14,18 +12,6 @@ It also provides mechanisms that are espacially useful to generate Python code b
 ```
 pip install protogen
 ```
-
-## What is a protoc plugin anyway?
-
-`protoc`, the **Proto**buf **c**ompiler, is used to generate code derived from Protobuf definitions (`.proto` files).
-Under the hood, `protoc`'s job is to read and parse the definitions into their *Descriptor* types (see [google/protobuf/descriptor.proto](https://github.com/protocolbuffers/protobuf/blob/4f49062a95f18a6c7e21ba17715a2b0a4608151a/src/google/protobuf/descriptor.proto)).
-When `protoc` is run (with a plugin) it creates a `CodeGeneratorRequest` (see [google/protobuf/compiler/plugin.proto#L68](https://github.com/protocolbuffers/protobuf/blob/4f49062a95f18a6c7e21ba17715a2b0a4608151a/src/google/protobuf/compiler/plugin.proto#L68)) that contains the descriptors for the files to generate and everything they import and passes it to the plugin via `stdin`.
-
-A *protoc plugin* is an executable. It reads the `CodeGeneratorRequest` from `stdin` and returns a `CodeGeneratorResponse` (see [google/protobuf/compiler/plugin.proto#L99](https://github.com/protocolbuffers/protobuf/blob/4f49062a95f18a6c7e21ba17715a2b0a4608151a/src/google/protobuf/compiler/plugin.proto#L99)) via `stdout`.
-The plugin can use the descriptors from the `CodeGeneratorRequest` to create output files (in memory).
-It returns these output files (consisting of name and content as string) in the `CodeGeneratorResponse` to `protoc`.
-
-`protoc` then writes these files to disk.
 
 ## API
 
@@ -158,6 +144,18 @@ def py_import_func(
 ```
 
 # Misc
+
+## What is a protoc plugin anyway?
+
+`protoc`, the **Proto**buf **c**ompiler, is used to generate code derived from Protobuf definitions (`.proto` files).
+Under the hood, `protoc`'s job is to read and parse the definitions into their *Descriptor* types (see [google/protobuf/descriptor.proto](https://github.com/protocolbuffers/protobuf/blob/4f49062a95f18a6c7e21ba17715a2b0a4608151a/src/google/protobuf/descriptor.proto)).
+When `protoc` is run (with a plugin) it creates a `CodeGeneratorRequest` (see [google/protobuf/compiler/plugin.proto#L68](https://github.com/protocolbuffers/protobuf/blob/4f49062a95f18a6c7e21ba17715a2b0a4608151a/src/google/protobuf/compiler/plugin.proto#L68)) that contains the descriptors for the files to generate and everything they import and passes it to the plugin via `stdin`.
+
+A *protoc plugin* is an executable. It reads the `CodeGeneratorRequest` from `stdin` and returns a `CodeGeneratorResponse` (see [google/protobuf/compiler/plugin.proto#L99](https://github.com/protocolbuffers/protobuf/blob/4f49062a95f18a6c7e21ba17715a2b0a4608151a/src/google/protobuf/compiler/plugin.proto#L99)) via `stdout`.
+The plugin can use the descriptors from the `CodeGeneratorRequest` to create output files (in memory).
+It returns these output files (consisting of name and content as string) in the `CodeGeneratorResponse` to `protoc`.
+
+`protoc` then writes these files to disk.
 
 ## Run `protoc` with your plugin
 
