@@ -38,12 +38,10 @@ def generate(gen: protogen.Plugin):
         g.P()
         for m in f.message:
             g.P("class ", m.py_ident, ":")
-            g.P("  pass")
             for ff in m.fields:
                 # ...
         for s in f.services:
             g.P("class ", s.py_ident, ":")
-            g.P("  pass")
             for m in f.methods:
                 g.P("  def ", m.py_name, "(request):")
                 g.P("    pass")
