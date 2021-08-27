@@ -1,20 +1,9 @@
 [tool.poetry]
 name = "protogen"
-version = "0.2.0-alpha.0"
-description = "protogen makes writing protoc plugins easy."
-authors = ["fischor <fischor.sh@gmail.com>"]
-maintainers = ["fischor <fischor.sh@gmail.com>"]
-license = "MIT"
-readme = "README.md"
-homepage = ""
-repository = "https://github.com/fischor/protogen-python"
-keywords = [
-    "proto",
-    "protoc",
-    "Protobuf",
-    "Protocol buffers",
-    "Code generation",
-]
+version = "0.1.1-alpha.0"
+description = "todo"
+authors = ["fischor <fischor@norep.ly>"]
+license = "todo"
 
 [tool.poetry.dependencies]
 python = ">3.6.2,<4.0"
