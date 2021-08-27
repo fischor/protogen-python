@@ -2,7 +2,7 @@
 
 Package `protogen` makes writing `protoc` plugins easier.
 Working with the raw protobuf descriptor messages can be cumbersome.
-`protogen` resolves and links the dependencies and references between the raw descriptors and turns them into their corresponding `protogen` classes that are easier to work with.
+`protogen` resolves and links the dependencies and references between the raw Protobuf descriptors and turns them into their corresponding `protogen` classes that are easier to work with.
 It also provides mechanisms that are espacially useful to generate Python code like dealing with Python imports.
 
 ## Installation
@@ -15,7 +15,7 @@ pip install protogen
 
 ## API
 
-`protogen` provides a bunch of classes. Most of them are simply replacements of their corresponding descriptors. E.g. `protogen.File` represents a `FileDescriptor`, `protogen.Message` a `Descriptor`, `protogen.Field` a FieldDescriptor etc. They should be self explanatory. You can read their docstrings for more information about them.
+Most classes in `protogen` are simply replacements of their corresponding Protobuf descriptors: `protogen.File` represents a FileDescriptor, `protogen.Message` a Descriptor, `protogen.Field` a FieldDescriptor and so on. They should be self explanatory. You can read their docstrings for more information about them.
 
 The classes `protogen.Options`, `protogen.Plugin` and `protogen.GeneratedFile` make up a framework to generate files.
 You can see these in action in the following example plugin:
@@ -54,17 +54,17 @@ if __name__ == "__main__":
 ## class `protogen.Options`
 
 The `protogen.Options` class can be used to specify options for the resolution process (resolution from plain proto descriptors to `protogen` classes).
-`Option.run(f: func(Plugin))` waits for `protoc` to write the `CodeGeneratorRequest` to `stdin`, resolves the descriptors contained in it to their corresponding `protogen` classes and initialize a new `Plugin` with the resolved classes.  
+`Option.run(f: func(Plugin))` waits for `protoc` to write the CodeGeneratorRequest to `stdin`, resolves the descriptors contained in it to their corresponding `protogen` classes and initializes a new `Plugin` with the resolved classes.  
 `f` is then called with the `Plugin` as argument.
 
-Once `f` returns, `Options` will collect the `CodeGeneratorResponse` from the `Plugin` that contains the all created `GeneratedFile`s and write it to `stdout` for `protoc` to pick it up.
+Once `f` returns, `Options` will collect the CodeGeneratorResponse from the `Plugin` that contains the all created `GeneratedFile`s and write it to `stdout` for `protoc` to pick it up.
 `protoc` writes the generated files to disk.
 
 ## class `protogen.Plugin`
 
 The `Plugin` class holds the files code generation is requested for in the `Plugin.files_to_generate` attribute. These are the files that were provided as command line arguments to `protoc`.
 Any options/parameters passed to the plugin via the `protoc --plugin_opt=<param>` command line flag are accessible via `Plugin.parameter`.
-With `Plugin.new_generated_file` a new `GeneratedFile` gets created that is automatically added to the `CodeGeneratorResponse` of the plugin.
+With `Plugin.new_generated_file` a new `GeneratedFile` gets created that is automatically added to the CodeGeneratorResponse of the plugin.
 Typically, but not necessarily, one file for each file in `Plugin.files_to_generate` is created.
 
 ## class `protogen.GeneratedFile`
@@ -72,31 +72,29 @@ Typically, but not necessarily, one file for each file in `Plugin.files_to_gener
 The `GeneratedFile` is just a buffer you can add lines to using the `g.P` (print) method.
 A `GeneratedFile` is created with `Plugin.new_generated_file(filename, py_import_path)`.
 The `filename` is obviously the name of the file to be created.
-The `py_import_path` is used for *import resolution* (see below).
+The `py_import_path` is used for *import resolution*.
 
-## Import resolution
+Note that the following assumes the plugin generates Python code. For other kinds of plugins, the following is not relevant:
 
-This assumes the Plugin generates Python code. For other kinds of Plugins, the following is not relevant.
-
-It is often necessary to import messages and enums that are defined in different Python modules.
-For example, a Protobuf Messages might reference `google.protobuf.Timestamp` in one of its fields.
+It is often necessary to import Python identifiers that are defined in different Python modules.
+For example, a Protobuf messages might reference `google.protobuf.Timestamp` in one of its fields.
 The corresponding Python class `google.protobuf.timestamp_pb2.Timestamp` needs to be imported before its mentioned in the generated code.
 
-For context: the `protogen.PyImportPath` class represent a Python import path. Is just a wrapper around an import path (string).
-The `PyIdent` class represent a Python identifier. It holds a `PyImportPath` together with a name (e.g. class name).
+The `protogen.PyImportPath` class represent a Python import path. Is just a wrapper around an import path (for example `"google.protobuf.timestamp_pb2"`).
+The `PyIdent` class represent a Python identifier. It holds a `PyImportPath` together with a name (e.g. a class name like `"Timestamp"`).
 
-There are way how one may import and reference a class in Python.
-One might import `from google.protobuf.timestamp_pb2 import Timestamp` and reference it by simply `Timestamp` is the module.
-However, to avoid ambiguities (here: two messages with the same name) it is often better to `import google.protobuf.timestamp_pb2` and reference it using its fully qualified Python identifier: `google.protobuf.timestamp_pb2.Timestamp` *in generated code*.
-
-The `protogen.GeneratedFile` is using this approach and provides mechanism to handle imports automatically.
-Internally `GeneratedFile` maintains a list of `PyImportPath`s that it needs to import (a mark where to print the imports in the output of the `GeneratedFile` can be set using `GeneratedFile.print_imports()`).
+The `protogen.GeneratedFile` provides mechanisms to handle Python imports.
+Internally it maintains a list of `PyImportPath`s that it needs to import.
 `PyImportPaths` might be added to this list implictly when calling `GeneratedFile.P(*args)` or rather explicitly when calling `GeneratedFile.qualified_py_ident(PyIdent)`.
 When any of the arguments to `GeneratedFile.P` is a `protogen.PyIdent`, the `py_import_path` of the `GeneratedFile` gets compared to the arguments `PyIdent.py_import_path`. 
-If they are from different Python modules, the arguments import path will be added to the list of imports and the fully qualified name of the `PyIdent` will be written to the `GeneratedFile`s buffer. 
-If both files are from the same `PyImportPath`, then the path can be omitted. In that case just the simple class name (e.g. `Timestamp`) will be written to the buffer.
 
-For example:
+If they are from different Python modules, the arguments import path will be added to the list of imports and the fully qualified name of the `PyIdent` will be printed. 
+
+If both files are from the same `PyImportPath`, then the import path is not added to the list of imports. In that case it is sufficient to reference the `PyIdent` by its simple name (e.g. `Timestamp`), thus only the `PyIdent.py_name` will be printed.
+
+To place the import statements in the buffer of the `GeneratedFile` use `GeneratedFile.print_imports`. This will put a line `"import <path>"` for each `PyImportPath` that the generated file needs to import (e.g `"import google.protobuf.timestamp_pb2"`) in the buffer.
+
+The following example shows how the `GeneratedFile.P` function behaves for different `PyImportPaths`::
 
 ```python
 # g is of type protogen.GeneratedFile
@@ -108,12 +106,12 @@ For example:
 >>> message_a.py_ident
 { py_import_path: "google.protobuf.timestamp_pb2", py_name: "Timestamp" }
 >>> g.P("hello ", message_a.py_ident) 
-# adds "hello google.protobuf.timestamp_pb2.Timestamp" to g's buffer and "google.protobuf.timestamp_pb2" to the imports
+# adds "hello google.protobuf.timestamp_pb2.Timestamp" to g's line buffer and "google.protobuf.timestamp_pb2" to the imports
 
 >>> message_b.py_ident
 { py_import_path: "mypackage.mymodule", py_name: "MyMessage" }
 >>> g.P("hello ", message_b.py_ident) 
-# adds "hello MyMessage" to g's buffer (and nothing to the imports)
+# adds "hello MyMessage" to g's line buffer (and nothing to the imports)
 ```
 
 Note that you can provide a custom `py_import_func` in the `Options` constructor.
@@ -147,11 +145,11 @@ def py_import_func(
 
 `protoc`, the **Proto**buf **c**ompiler, is used to generate code derived from Protobuf definitions (`.proto` files).
 Under the hood, `protoc`'s job is to read and parse the definitions into their *Descriptor* types (see [google/protobuf/descriptor.proto](https://github.com/protocolbuffers/protobuf/blob/4f49062a95f18a6c7e21ba17715a2b0a4608151a/src/google/protobuf/descriptor.proto)).
-When `protoc` is run (with a plugin) it creates a `CodeGeneratorRequest` (see [google/protobuf/compiler/plugin.proto#L68](https://github.com/protocolbuffers/protobuf/blob/4f49062a95f18a6c7e21ba17715a2b0a4608151a/src/google/protobuf/compiler/plugin.proto#L68)) that contains the descriptors for the files to generate and everything they import and passes it to the plugin via `stdin`.
+When `protoc` is run (with a plugin) it creates a CodeGeneratorRequest (see [google/protobuf/compiler/plugin.proto#L68](https://github.com/protocolbuffers/protobuf/blob/4f49062a95f18a6c7e21ba17715a2b0a4608151a/src/google/protobuf/compiler/plugin.proto#L68)) that contains the descriptors for the files to generate and everything they import and passes it to the plugin via `stdin`.
 
-A *protoc plugin* is an executable. It reads the `CodeGeneratorRequest` from `stdin` and returns a `CodeGeneratorResponse` (see [google/protobuf/compiler/plugin.proto#L99](https://github.com/protocolbuffers/protobuf/blob/4f49062a95f18a6c7e21ba17715a2b0a4608151a/src/google/protobuf/compiler/plugin.proto#L99)) via `stdout`.
-The plugin can use the descriptors from the `CodeGeneratorRequest` to create output files (in memory).
-It returns these output files (consisting of name and content as string) in the `CodeGeneratorResponse` to `protoc`.
+A *protoc plugin* is an executable. It reads the CodeGeneratorRequest from `stdin` and returns a CodeGeneratorResponse (see [google/protobuf/compiler/plugin.proto#L99](https://github.com/protocolbuffers/protobuf/blob/4f49062a95f18a6c7e21ba17715a2b0a4608151a/src/google/protobuf/compiler/plugin.proto#L99)) via `stdout`.
+The plugin can use the descriptors from the CodeGeneratorRequest to create output files (in memory).
+It returns these output files (consisting of name and content as string) in the CodeGeneratorResponse to `protoc`.
 
 `protoc` then writes these files to disk.
 
