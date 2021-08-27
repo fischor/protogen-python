@@ -1,8 +1,8 @@
 on:
   push:
-    branches: [main]
+    branches: [main, actions]
   pull_request:
-    branches: [main]
+    branches: [main, actions]
 
 name: Build
 
@@ -35,7 +35,7 @@ jobs:
         uses: actions/cache@v2.1.6
         with:
           path: ~/.poetry
-          key: ubuntu-latest-poetry
+          key: poetry
       # Only runs when key from caching step changes
       - name: Install latest version of Poetry
         if: steps.cache-poetry.outputs.cache-hit != 'true'
@@ -55,8 +55,7 @@ jobs:
         uses: actions/cache@v2.1.6
         with:
           path: ${{github.workspace}}/.venv
-          key: ${{ matrix.os }}-${{ hashFiles('**/poetry.lock') }}
-          restore-keys: ubuntu-latest-
+          key: deps-${{ hashFiles('**/poetry.lock') }}
       - name: Install deps
         if: steps.cache-deps.cache-hit != 'true'
         run: |
