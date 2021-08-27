@@ -1202,14 +1202,11 @@ class File:
         self,
         proto: google.protobuf.descriptor_pb2.FileDescriptorProto,
         generate: bool,
-        py_import_func: Callable[[str, str], str],
+        py_import_func: Callable[[str, str], PyImportPath],
     ):
         self.proto = proto
         self.generated_filename_prefix = proto.name[: -len(".proto")]
-        # The actual pyton path is determined using the py_import_func.
-        # TODO maybe require the rewrite func to return a Python file and
-        # then generate the import path from that python filename
-        self.py_import_path = PyImportPath(py_import_func(proto.name, proto.package))
+        self.py_import_path = py_import_func(proto.name, proto.package)
         self.py_package_name = str(proto.package)
         self.generate = generate
         self.dependencies: List[File] = []
@@ -1533,7 +1530,7 @@ class Plugin:
             self._error = msg
 
 
-def default_py_import_func(filename: str, package: str) -> str:
+def default_py_import_func(filename: str, package: str) -> PyImportPath:
     """Return the Python import path for a file.
 
     Return the Python import path for a file following the behaviour of the
@@ -1551,7 +1548,7 @@ def default_py_import_func(filename: str, package: str) -> str:
 
     Returns
     -------
-    str
+    PyImportPath
         The Python import path for the file.
 
     Example
@@ -1559,7 +1556,7 @@ def default_py_import_func(filename: str, package: str) -> str:
     >>> default_py_import_func("google/protobuf/field_mask.proto", "google.protobuf")
     "google.protobuf.field_mask_pb2"
     """
-    return filename.replace(".proto", "_pb2").replace("/", ".")
+    return PyImportPath(filename.replace(".proto", "_pb2").replace("/", "."))
 
 
 class Options:
@@ -1576,7 +1573,7 @@ class Options:
     def __init__(
         self,
         *,
-        py_import_func: Callable[[str, str], str] = default_py_import_func,
+        py_import_func: Callable[[str, str], PyImportPath] = default_py_import_func,
         input: BinaryIO = sys.stdin.buffer,
         output: BinaryIO = sys.stdout.buffer,
     ):
@@ -1584,7 +1581,7 @@ class Options:
 
         Arguments
         ---------
-        py_import_func : Callable[[str, str], str], optional
+        py_import_func : Callable[[str, str], PyImportPath], optional
             Defines how to derive :class:`PyImportPath` for the :class:`File`
             objects in the resolution process. This also influences the
             :class:`PyIdent` attributes that are part of :class:`Message`,
