@@ -1,21 +1,20 @@
 """Package protogen makes writing protoc plugins easy.
 
-A protoc plugin essentialy turns a CodeGeneratorRequest from protoc into
-CodeGeneratorResponse. The CodeGeneratorRequest contains the raw proto
-descriptors of the proto definitions contained in the files code generation is
-requested for (and the descriptors of every file thats imported). The
-CodeGeneratorResponse is returned by to plugin to protoc. It contains a list of
-files (name and content) the plugin wants protoc to write to disk.
+Working with the raw protobuf descriptor messages can be cumbersome.  `protogen`
+resolves and links the dependencies and references between the raw Protobuf
+descriptors and turns them into their corresponding `protogen` classes that are
+easier to work with.  It also provides mechanisms that are espacially useful to
+generate Python code like dealing with Python imports.
 
-``protogen`` provides a bunch of classes to ease writing protoc plugins. Most of
-them are simply replacements of their corresponding descriptors. E.g.
-:class:`File` represents a proto FileDescriptor, :class:`Message` a proto
-Descriptor, :class:`Service` a proto ServiceDescriptor etc. They should be self
-explanatory. You can read their docstrings for more information about them.
+Most classes in `protogen` are simply replacements of their corresponding
+Protobuf descriptors: `protogen.File` represents a FileDescriptor,
+`protogen.Message` a Descriptor, `protogen.Field` a FieldDescriptor and so on.
+They should be self explanatory. You can read their docstrings for more
+information about them.
 
-The classes :class:`Options`, :class:`Plugin` and :class:`GeneratedFile` make up
-a framework to generate (Python) files from a CodeGeneratorRequest.  You can see
-these in action in the following example plugin:
+The classes `protogen.Options`, `protogen.Plugin` and `protogen.GeneratedFile`
+make up a framework to generate files.  You can see these in action in the
+following example plugin:
 
 .. code-block:: python
 
@@ -36,12 +35,10 @@ these in action in the following example plugin:
             g.P()
             for m in f.message:
                 g.P("class ", m.py_ident, ":")
-                g.P("  pass")
                 for ff in m.fields:
                     # ...
             for s in f.services:
                 g.P("class ", s.py_ident, ":")
-                g.P("  pass")
                 for m in f.methods:
                     g.P("  def ", m.py_name, "(request):")
                     g.P("    pass")
