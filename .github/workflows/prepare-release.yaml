@@ -18,6 +18,16 @@ jobs:
         uses: actions/setup-python@v2.2.2
         with:
           python-version: '3.8'
+      - name: python --version
+        run: |
+          python --version
+          python3 --version
+      - name: Setup protoc
+        uses: arduino/setup-protoc@v1
+        with:
+          version: '3.17.3'
+      - name: protoc --version
+        run: protoc --version
       - name: Permacache Poetry
         id: cache-poetry
         uses: actions/cache@v2.1.6
@@ -41,8 +51,7 @@ jobs:
           echo $TAG
           echo $PROJECT_VERSION
           if [[ "$TAG" != "v$PROJECT_VERSION" ]]; then exit 1; fi
-      
-      - name: Get Poetry version
+      - name: poetry --version
         run: poetry --version
       - name: Check pyproject.toml validity
         run: poetry check --no-interaction
