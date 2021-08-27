@@ -1464,15 +1464,19 @@ class Plugin:
     files_to_generate : List[File]
         Set of files to code generation is request for. These are the files
         explictly passed to protoc as command line arguments.
+    registry : Registry
+        The registry that was used in the resolution process for this plugin.
     """
 
     def __init__(
         self,
         parameter: Dict[str, str],
         files_to_generate: List[File],
+        registry: Registry,
     ):
         self.parameter = parameter
         self.files_to_generate = files_to_generate
+        self.registry = registry
 
         self._error: Optional[str] = None
         self._generated_files: List[GeneratedFile] = []
@@ -1668,7 +1672,7 @@ class Options:
                 files_to_generate.append(file)
 
         # Create plugin and run the provided code generation function.
-        plugin = Plugin(parameter, files_to_generate)
+        plugin = Plugin(parameter, files_to_generate, registry)
         f(plugin)
 
         # Write response.
