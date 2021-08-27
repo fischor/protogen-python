@@ -19,8 +19,8 @@ sys.path.insert(0, os.path.abspath("../../"))  # allows to find protogen module
 # -- Project information -----------------------------------------------------
 
 project = "protogen"
-copyright = "2021, train.ai"
-author = "train.ai"
+copyright = "2021, fischor"
+author = "fischor"
 
 
 # -- General configuration ---------------------------------------------------
