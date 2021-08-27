@@ -820,8 +820,8 @@ class Field:
             if self.message is None:
                 raise ResolutionError(
                     file=self.parent_file.proto.name,
-                    ref=self.full_name,
-                    type_name=self.proto.type_name,
+                    desc=self.full_name,
+                    ref=self.proto.type_name,
                 )
 
 
