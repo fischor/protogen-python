@@ -30,7 +30,9 @@ jobs:
         with:
           python-version: 3.8
       - name: python --version
-        run: python --version
+        run: |
+          python --version
+          python3 --version
       - name: Setup protoc
         uses: arduino/setup-protoc@v1
         with:
@@ -69,11 +71,9 @@ jobs:
         run: |
           poetry config virtualenvs.in-project true
           poetry install --no-interaction
-      - name: Prepare PYTHONPATH
+      - name: Run tests
         run: |
           export PYTHONPATH=$(pwd)
-          echo $PYTHONPATH
-      - name: Run tests
-        run: python -m unittest test.test_protogen
+          python -m unittest test.test_protogen
       - name: Build artifacts
         run: poetry build
