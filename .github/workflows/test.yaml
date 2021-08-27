@@ -4,22 +4,15 @@ on:
   pull_request:
     branches: [main, actions]
 
-name: Build
+name: Test
 
 defaults:
   run:
     shell: bash
 
 jobs:
-  black-formatting-check:
-    name: Check formatting
-    runs-on: 'ubuntu-latest'
-    steps:
-      - uses: actions/checkout@v2.3.4
-      - uses: actions/setup-python@v2.2.2
-      - uses: psf/black@stable
-  build:
-    name: Build tool
+  test:
+    name: Run tests
     runs-on: ubuntu-latest
     needs: black-formatting-check
     steps:
