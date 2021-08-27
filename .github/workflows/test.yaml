@@ -28,7 +28,7 @@ jobs:
       - name: Setup protoc
         uses: arduino/setup-protoc@v1
         with:
-          version: '3.17.3'
+          version: "3.17.3"
       - name: protoc --version
         run: protoc --version
       # Perma-cache Poetry since we only need it for checking pyproject version
