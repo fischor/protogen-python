@@ -72,8 +72,6 @@ jobs:
           poetry config virtualenvs.in-project true
           poetry install --no-interaction
       - name: Run tests
-        run: |
-          export PYTHONPATH=$(pwd)
-          python -m unittest test.test_protogen
+        run: poetry run python -m unittest test.test_protogen
       - name: Build artifacts
         run: poetry build
