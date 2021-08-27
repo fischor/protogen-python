@@ -143,7 +143,7 @@ class Registry:
         return self._messages_by_name[name]
 
     def enum_by_name(self, name: str) -> Optional["Enum"]:
-        """Get an enum by its full name.
+        """Get a enum by its full name.
 
         Arguments
         ---------
@@ -302,6 +302,7 @@ def _clean_comment(cmmt: str) -> str:
     return "\n".join(clean_lines)
 
 
+# TODO maybe dataclass
 class Location:
     """A proto location.
 
@@ -315,13 +316,14 @@ class Location:
     source_file : str
         Name of the file the location is from.
     path : List[int]
-        Identifies which part of the FileDescriptor was defined at the location.
+        Identifies which part of the FileDescriptorProto was defined at this
+        location. 
     leading_comments : str
         Comments directly attached (leading) to the location. Not separated with
-        a blank.
+        a newline.
     trailing_comments : str
         Comments directly attached (trailing) to the location. Not separated
-        with a blank.
+        with a newline.
     leading_detached_comments : List[str]
         Comments that are leading to the current location and detached from it
         by at least one blank line.
@@ -415,7 +417,7 @@ def _resolve_location(
 class PyImportPath:
     """A Python import path.
 
-    Represents a Python import path as used in a Python import statement. In
+    Represents a python import path as used in an Python import statement. In
     Python, the import path is used to identify the module to import. An import
     path "google.protobuf.timestamp_pb2" refers to the
     "google/protobuf/timestamp_pb2.py" module and might be imported as follows:
@@ -429,7 +431,7 @@ class PyImportPath:
     This is just a simple wrapper class around the import string. It is used in
     the `GeneratedFile` to keep track of which import statements need to be
     included in the output of the generated file as well as how a `PyIdent`
-    needs to be referred to in the output the generated file.
+    needs to be referred in the output the generated file.
 
     Example
     -------
@@ -446,7 +448,7 @@ class PyImportPath:
     """
 
     def __init__(self, path: str):
-        """Create a new Python import path wrapping `path`."""
+        """Create a new import path wrapping `path`."""
         self._path = path
 
     def ident(self, name: str) -> "PyIdent":
@@ -456,7 +458,7 @@ class PyImportPath:
         ---------
         name : str
             Python name of the identifier.
-
+        
         Returns
         -------
         PyIdent
@@ -497,7 +499,7 @@ def _sanitize_name(value: str) -> str:
 
 
 class PyIdent:
-    """An identifier for a Python class, function or variable.
+    """An identifier a Python class, function or variable.
 
     A Python class, function or variable is uniquely identified by its import
     path (e.g. ``google.protobuf.timestamp_pb2``), that references the module its
@@ -574,14 +576,14 @@ class EnumValue:
         Full proto name of the enum value. Note that full names of enum values
         are different: All other proto declarations are in the namespace of
         their parent. Enum values however are within the namespace of ther
-        parent file.  An enum value named ``FOO_VALUE`` declared within an enum
+        parent file.  An enum value named ``FOO_VALUE`` decleared within an enum
         ``proto.package.MyEnum`` has a full name of ``proto.package.FOO:VALUE``.
     number : int
         The enum number.
     parent : Enum
         The enum the enum value is declared in.
     location : Location
-        Comments associated with the enum value.
+        Comments associated with this enum value.
     """
 
     def __init__(
@@ -624,7 +626,7 @@ class Enum:
     values : List[EnumValue]
         Values of the enum.
     location : Location
-        Comments associated with the enum.
+        Comments associated with this enum.
     """
 
     def __init__(
@@ -694,15 +696,15 @@ class Field:
     cardinality : Cardinality
         Cardinality of the field.
     enum : Enum or None
-        The enum type of the field in case the fields :attr:`kind` is
+        The enum type of this field in case the fields :attr:`kind` is
         :attr:`Kind.Enum`. ``None`` otherwise.
     message : Message or None
-        The message type of the field in case the fields :attr:`kind` is
+        The message type of this field in case the fields :attr:`kind` is
         :attr:`Kind.Message`. ``None`` otherwise.
     extendee : Message or None
         The extendee in case this is a top-level extension. ``None`` otherwise.
     location : Location
-        Comments associated with the field.
+        Comments associated with this message.
     """
 
     def __init__(
@@ -730,19 +732,19 @@ class Field:
         self.enum: Optional["Enum"] = None
 
     def is_map(self) -> bool:
-        """Whether the field is a map field.
+        """Whether this field is a map field.
 
         Returns
         -------
         bool
-            ``True`` if the field is a map field. ``False`` otherwise.
+            ``True`` if this field is a map field. ``False`` otherwise.
         """
         if self.message is None:
             return False
         return _is_map(self.message)
 
     def is_list(self) -> bool:
-        """Whether the field is a list field.
+        """Whether this field is a list field.
 
         A list fields has a :attr:`cardinality` of ``Cardinality.REPEATED`` and
         is not a map field.
@@ -750,31 +752,31 @@ class Field:
         Returns
         -------
         bool
-            ``True`` if the field is a list field. ``False`` otherwise.
+            ``True`` if this field is a list field. ``False`` otherwise.
         """
         return self.cardinality == Cardinality.REPEATED and not self.is_map()
 
     def map_key(self) -> Optional["Field"]:
-        """Return the map key if the field is a map field.
+        """Return the map key if this is a map field.
 
         Returns
         -------
         Field or None
-            The field of the map key if :meth:`is_map` is ``True``. ``None``
-            otherwise.
+            Returns the field of the map key if :meth:`is_map` is ``True``.
+            ``None`` otherwise.
         """
         if not self.is_map():
             return None
         return self.message.fields[0]
 
     def map_value(self) -> Optional["Field"]:
-        """Return the map value if the field is a map field.
+        """Return the map value if this is a map field.
 
         Returns
         -------
         Field or None
-            The field of the map value if :meth:`is_map` is ``True``. ``None``
-            otherwise.
+            Returns the field of the map value if :meth:`is_map` is ``True``.
+            ``None`` otherwise.
         """
         if not self.is_map():
             return None
@@ -848,7 +850,7 @@ class OneOf:
     fields : List[Field]
         Fields that are part of the oneof.
     location : Location
-        Comments associated with the oneof.
+        Comments associated with this oneof.
     """
 
     def __init__(
@@ -904,7 +906,7 @@ class Message:
     extensions : List[Extension]
         Nested extension declations.
     location : Location
-        Comments associated with the message.
+        Comments associated with this message.
     """
 
     def __init__(
@@ -1064,12 +1066,12 @@ class Method:
     proto : google.protobuf.descriptor_pb2.MethodDescriptorProto
         The raw MethodDescriptor of the method.
     py_name : str
-        Python name of the method. A snake cased version of the proto name.
+        A snake cased version of the orginal method name.
     full_name : str
         Full proto name of the method.
     grpc_path :str
-        The grpc path of the method. Derived from the service and method name:
-        ``"/{service name}/{method name}"``
+        The grpc path of the method. Derived from the service and method name as
+        defined in the GRPC protocol spec: ``"/{service name}/{method name}"``
     parent : Service
         The service the method is declared in.
     input : Message
@@ -1077,7 +1079,7 @@ class Method:
     output : Message
         The output message of the method.
     location : Location
-        Comments associated with the method.
+        Comments associated with this method.
     """
 
     def __init__(
@@ -1138,7 +1140,7 @@ class Service:
     methods : List[Method]
         Service method declarations.
     location : Location
-        Comments associated with the service.
+        Comments associated with this service.
     """
 
     def __init__(
@@ -1184,19 +1186,19 @@ class File:
     py_package_name : str
         Name of the proto package the file belongs to. This is the result of the
         proto package name of the proto file applied to the ``py_import_function``
-        of the ``Plugin`` that is used to read the file.
+        of the ``Plugin`` that is used to read this file.
     py_import_path : PyImportPath
-        Import path for the file.
+        Import path for this file.
     generate : bool
-        Whether Python code should be generated for the file.
+        Whether Python code should be generated for this file.
     dependencies : List[File]
-        Files imported by the file.
+        Files imported by this file.
     enums : List[Enum]
         Top-level enum declarations.
     messages : List[Message]
         Top-level message declarations.
     services : List[Service]
-        Service declarations.
+        Top-level service declarations.
     extensions List[Extension]
         Top-level extension declarations.
     """
@@ -1233,8 +1235,7 @@ class File:
 
         self.services: List[Service] = []
         for i in range(len(proto.service)):
-            # 6 is the number of the service in the FileDescriptorProto.
-            path = [6, i]
+            path = [6, i]  # 6 is the number of the service in the FileDescriptorProto.
             service = Service(proto.service[i], self, path)
             self.services.append(service)
 
@@ -1295,7 +1296,7 @@ class GeneratedFile:
     requires a ``filename`` and a ``py_import_path`` as parameter.  The
     ``filename`` is obviously the name of the file to be created.  The
     ``py_import_path`` is used for *import resolution*. It specifies the Python
-    module the generated file is representing.
+    module this generated file is representing.
 
     When calling :meth:`qualified_py_ident` the generated files import path is
     compared to the import path of the Python identifier that is passed as an
@@ -1303,11 +1304,6 @@ class GeneratedFile:
     :class:`PyImportPath` of the argument is added to the list of imports of the
     generated file.  Note that also :meth:`P` calls :meth:`qualified_py_ident`,
     so the above also applies to :class:`PyIdent` arguments passed to :meth:`P`.
-
-    Attributes
-    ----------
-    name : str
-        Name of the generated file.
     """
 
     def __init__(
@@ -1390,7 +1386,7 @@ class GeneratedFile:
         self._buf.append(_indent(line, self._indent))
 
     def qualified_py_ident(self, ident: PyIdent) -> str:
-        """Obtain the qualified Python identifier name with respect to the generated file.
+        """Obtain the qualified Python identifier name with respect to this file.
 
         If ``ident.py_import_path`` and the :attr:`import_path` of the generated
         file refer to different Python modules, the ``ident.py_import_path``
@@ -1429,8 +1425,6 @@ class GeneratedFile:
         >>> g.P("# My python file")
         >>> g.P()
         >>> g.print_imports()
-        >>> g.P()
-        >>> g.P("# more content following after the imports..")
         """
         self._import_mark = len(self._buf)
 
@@ -1465,8 +1459,7 @@ class Plugin:
         Parameter passed to the plugin using ``{plugin name}_opt=<key>=<value>`
         or ``<plugin>_out=<key>=<value>`` command line flags.
     files_to_generate : List[File]
-        Set of files to code generation is request for. These are the files
-        explictly passed to protoc as command line arguments.
+        List of files to generate code for.
     """
 
     def __init__(
@@ -1494,7 +1487,7 @@ class Plugin:
     ) -> GeneratedFile:
         """Create a new generated file.
 
-        The generated file will be added to the output of the plugin.
+        The generated file will be added to automatically to the plugins output.
 
         Arguments
         ---------
@@ -1502,9 +1495,8 @@ class Plugin:
             Filename of the generated file.
         py_import_path : PyImportPath
             Python import path of the new generated file. This is used to decide
-            whether to print the fully qualified name or the simple name for a
-            Python identifier when using `GeneratedFile.P`. See
-            :class:`GeneratedFile`.
+            whether to print the fully qualified name or the simply name for a
+            python identifier when using `GeneratedFile.P`. See :class:`GeneratedFile`.
 
         Returns
         -------
@@ -1585,7 +1577,7 @@ class Options:
         ---------
         py_import_func : Callable[[str, str], str], optional
             Defines how to derive :class:`PyImportPath` for the :class:`File`
-            objects in the resolution process. This also influences the
+            classes in the resolution process. This also influences the
             :class:`PyIdent` attributes that are part of :class:`Message`,
             :class:`Enum`, and :class:`Service` classes as their import paths
             are inherited from the :class:`File` they are defined in.  Defaults
@@ -1602,7 +1594,7 @@ class Options:
         self._py_import_func = py_import_func
 
     def run(self, f: Callable[[Plugin], None]):
-        """Start resolution process and run ``f`` with the :class:`Plugin` containing the resolved classes.
+        """Start the resolution process and run ``f`` with the :class:`Plugin`.
 
         run waits for protoc to write the CodeGeneratorRequest to
         :attr:`input`, resolves the raw FileDescriptors, Descriptors,
