@@ -1,5 +1,9 @@
 # `protogen`
 
+[![PyPI version](https://badge.fury.io/py/protogen.svg)](https://badge.fury.io/py/protogen)
+[![Documentation Status](https://readthedocs.org/projects/protogen/badge/?version=latest)](https://protogen.readthedocs.io/en/latest/?badge=latest)
+[![Test](https://github.com/fischor/protogen-python/actions/workflows/test.yaml/badge.svg?branch=main)](https://github.com/fischor/protogen-python/actions/workflows/test.yaml)
+
 Package `protogen` makes writing `protoc` plugins easier.
 Working with the raw protobuf descriptor messages can be cumbersome.
 `protogen` resolves and links the dependencies and references between the raw Protobuf descriptors and turns them into their corresponding `protogen` classes that are easier to work with.
@@ -15,7 +19,7 @@ pip install protogen
 
 ## API
 
-Most classes in `protogen` are simply replacements of their corresponding Protobuf descriptors: `protogen.File` represents a FileDescriptor, `protogen.Message` a Descriptor, `protogen.Field` a FieldDescriptor and so on. They should be self explanatory. You can read their docstrings for more information about them.
+Most classes in `protogen` are simply replacements of their corresponding Protobuf descriptors: `protogen.File` represents a FileDescriptor, `protogen.Message` a Descriptor, `protogen.Field` a FieldDescriptor and so on. They should be self explanatory. You can [read the docstrings](https://pypi.org/project/protogen/) for more information about them.
 
 The classes `protogen.Options`, `protogen.Plugin` and `protogen.GeneratedFile` make up a framework to generate files.
 You can see these in action in the following example plugin:
