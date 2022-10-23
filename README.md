@@ -165,12 +165,13 @@ You can invoke it via:
 ```
 protoc 
     --plugin=protoc-gen-myplugin=path/to/plugin/main.py \
-    --plugin_out=./output_root \
+    --myplugin_out=./output_root \
     myproto.proto myproto2.proto
 ```
 
 Caveats:
 - you must use the `--plugin=protoc-gen-<plugin_name>` prefix, otherwise `protoc` fails with "plugin not executable"
+- specify the output path of the plugin with `--<plugin_name>-out` flag where `<plugin_name>` is the same as used in the `--plugin` flag  
 - your plugin must be executable (`chmod +x path/to/plugin/main.py` and put a `#!/usr/bin/env python` at the top of the file)
 
 # See also
