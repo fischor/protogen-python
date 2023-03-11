@@ -42,7 +42,7 @@ jobs:
       - name: Install latest version of Poetry
         if: steps.cache-poetry.outputs.cache-hit != 'true'
         run: |
-          curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -
+          curl -sSL https://install.python-poetry.org | python3 -
       # Poetry still needs to be re-prepended to the PATH on each run, since
       # PATH does not persist between runs.
       - name: Add Poetry to $PATH
