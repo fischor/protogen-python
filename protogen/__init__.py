@@ -263,31 +263,106 @@ class Registry:
                 enums.append(enum)
         return enums
 
+    def resolve_enum_type(
+        self, reference_scope: str, proto_name: str
+    ) -> Optional["Enum"]:
+        """Resolve an enum name to an enum.
 
-def _resolve_enum_type_name(
-    registry: Registry, ref: str, type_name: str
-) -> Optional["Enum"]:
-    """Find a enum in the registry.
+        Searches for an enum within the registry by its proto name. If the
+        `proto_name` has a leading dot the name is treated as fully qualified,
+        otherwise the enum is resolved relative to the reference scope using
+        C++ scoping rules.
 
-    Intended to be used to resolve `FieldDescriptorProto.type_name`.
-    """
-    if type_name.startswith("."):
-        return registry.enum_by_name(type_name[1:])
-    return Exception("resolve without dot notation not implemented yet")
+        E.g. given a `reference_scope` of `"mycom.cloud.datastore.v1.Hello`" and
+        a `proto_name' of `"World"` the registry would be search for (in that
+        order):
 
+            - mycom.cloud.datastore.v1.Hello.World
+            - mycom.cloud.datastore.v1.World
+            - mycom.cloud.datastore.World
+            - mycom.cloud.World
+            - mycom.World
+            - World
 
-def _resolve_message_type_name(
-    registry: Registry, ref: str, type_name: str
-) -> Optional["Message"]:
-    """Resolve a type_name.
+        and the first existing enum type would be returned.
 
-    Intended to be used to resolve `FieldDescriptorProto.type_name`.
-    `MethodDescriptorProto.input_type` and `MethodDescriptorProto-output_type`.
-    To resolve this, several
-    """
-    if type_name.startswith("."):
-        return registry.message_by_name(type_name[1:])
-    return None
+        Arguments
+        ---------
+        reference_scope : str
+            The current scope that acts as starting points in the enum type
+            resolution process.
+        proto_name : str
+            The proto (enum type) name to resolve.
+
+        Returns
+        -------
+        response: protogen.Enum | None
+            The resolved protogen enum type, or `None` if no enum with that name
+            could be found under the reference scope.
+        """
+        if proto_name.startswith("."):
+            return self.enum_by_name(proto_name[1:])
+
+        ref_split = reference_scope.split(".")
+        for i in reversed(range(len(ref_split) + 1)):
+            ref_i = ".".join(ref_split[:i]) + "." + proto_name
+            enum = self.enum_by_name(ref_i)
+            if enum is not None:
+                return enum
+
+        return None
+
+    def resolve_message_type(
+        self, reference_scope: str, proto_name: str
+    ) -> Optional["Message"]:
+        """Resolve a message name to a message.
+
+        Searches for a message within the registry by its proto name. If the
+        `proto_name` has a leading dot the name is treated as fully qualified,
+        otherwise the message is resolved relative to the reference scope using
+        C++ scoping rules.
+
+        E.g. given a `reference_scope` of `"mycom.cloud.datastore.v1.Hello`" and
+        a `proto_name' of `"World"` the registry would be search for (in that
+        order):
+
+            - mycom.cloud.datastore.v1.Hello.World
+            - mycom.cloud.datastore.v1.World
+            - mycom.cloud.datastore.World
+            - mycom.cloud.World
+            - mycom.World
+            - World
+
+        and the first existing message type would be returned.
+
+        Arguments
+        ---------
+        reference_scope : str
+            The current scope that acts as starting points in the message type
+            resolution process.
+        proto_name : str
+            The proto (message type) name to resolve.
+
+        Returns
+        -------
+        response: protogen.Message | None
+            The resolved protogen message type, or `None` if no message with
+            that name could be found under the reference scope.
+        """
+        if proto_name.startswith("."):
+            return self.message_by_name(proto_name[1:])
+
+        ref_split = reference_scope.split(".")
+        for i in reversed(range(len(ref_split) + 1)):
+            prefix = ref_split[:i]
+            _name = prefix + [proto_name]
+            name = ".".join(_name)
+
+            msg = self.message_by_name(name)
+            if msg is not None:
+                return msg
+
+        return None
 
 
 def _clean_comment(cmmt: str) -> str:
@@ -783,8 +858,8 @@ class Field:
     def _resolve(self, registry: Registry):
         # resolve extendee is present
         if self.proto.HasField("extendee"):
-            self.extendee = _resolve_message_type_name(
-                registry, self.full_name, self.proto.extendee
+            self.extendee = registry.resolve_message_type(
+                self.full_name, self.proto.extendee
             )
             if self.extendee is None:
                 raise ResolutionError(
@@ -800,9 +875,7 @@ class Field:
                     full_name=self.full_name,
                     msg="is of kind ENUM but has no `type_name` set",
                 )
-            self.enum = _resolve_enum_type_name(
-                registry, self.full_name, self.proto.type_name
-            )
+            self.enum = registry.resolve_enum_type(self.full_name, self.proto.type_name)
             if not self.enum:
                 raise ResolutionError(
                     file=self.parent_file.proto.name,
@@ -817,8 +890,8 @@ class Field:
                     full_name=self.full_name,
                     msg="is of kind MESSAGE but has no `type_name` set",
                 )
-            self.message = _resolve_message_type_name(
-                registry, self.full_name, self.proto.type_name
+            self.message = registry.resolve_message_type(
+                self.full_name, self.proto.type_name
             )
             if self.message is None:
                 raise ResolutionError(
@@ -1097,8 +1170,8 @@ class Method:
         self.location = _resolve_location(parent.parent_file.proto, path)
 
     def _resolve(self, registry: Registry):
-        self.input = _resolve_message_type_name(
-            registry, self.full_name, self.proto.input_type
+        self.input = registry.resolve_message_type(
+            self.full_name, self.proto.input_type
         )
         if self.input is None:
             raise ResolutionError(
@@ -1106,8 +1179,8 @@ class Method:
                 desc=self.full_name,
                 ref=self.proto.input_type,
             )
-        self.output = _resolve_message_type_name(
-            registry, self.full_name, self.proto.output_type
+        self.output = registry.resolve_message_type(
+            self.full_name, self.proto.output_type
         )
         if self.output is None:
             raise ResolutionError(
