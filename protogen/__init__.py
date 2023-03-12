@@ -52,7 +52,7 @@ following example plugin:
 import enum
 import keyword
 import sys
-from typing import BinaryIO, Callable, Dict, List, Optional, Set
+from typing import BinaryIO, Callable, Dict, List, Optional, Set, Tuple
 from operator import ior
 from functools import reduce
 
@@ -1350,6 +1350,59 @@ def _indent(s: str, width: int) -> str:
     return "\n".join(prefix_lines)
 
 
+class CodeGeneratorResponse:
+    """A code generator response.
+
+    This is the ``protogen`` equivalent to a protobuf CodeGeneratorResponse.
+
+    Attributes
+    ----------
+    proto : google.protobuf.descriptor_pb2.CodeGeneratorResponse
+        The raw CodeGeneratorResponse.
+    """
+
+    def __init__(
+        self, proto: google.protobuf.compiler.plugin_pb2.CodeGeneratorResponse
+    ) -> None:
+        self.proto = proto
+
+    def has_file(self, filename: str) -> bool:
+        """Checks if a file in the CodeGeneratorResponse.
+
+        Arguments
+        ---------
+        filename : str
+            Name of the file to check.
+
+        Returns
+        -------
+        ok: bool
+            `True`, if the file is contained in the response, `False` otherwise.
+        """
+        return any([file.name == filename for file in self.proto.file])
+
+    def file_content(self, filename) -> Tuple[str, bool]:
+        """Returns the content of a file from the CodeGeneratorResponse.
+
+        Arguments
+        ---------
+        filename : str
+            Name of the file to get the content for.
+
+        Returns
+        -------
+        content: Tuple[bool, str]
+            Returns `True` and the content of the file if a file with that name
+            exists in the CodeGeneratorResponse. Otherwise `False` and the empty
+            string is returned.
+        """
+        for file in self.proto.file:
+            if file.name == filename:
+                return file.content, True
+
+        return "", False
+
+
 class GeneratedFile:
     """An output buffer to write generated code to.
 
@@ -1670,10 +1723,10 @@ class Options:
             to use :func:`default_py_import_func`.
         input : BinaryIO, optional
             The input stream to read the CodeGeneratorRequest from. Defaults
-            to :attr:`sys.stdin.buffer`.
+            to :attr:`sys.stdin.buffer` if set as None.
         output : BinaryIO, optional
             The output stream to write the CodeGeneratorResponse to.
-            Defaults to :attr:`sys.stdout.buffer`.
+            Defaults to :attr:`sys.stdout.buffer` if set as None.
         supported_features : List[str]
             List of features that are supported by the plugin. This list will be
             delegated to protoc via the CodeGeneratorresponse.supported_features
@@ -1683,7 +1736,11 @@ class Options:
             in the list.
         """
         self._input = input
+        if input is None:
+            self._input = sys.stdin.buffer
         self._output = output
+        if output is None:
+            self._output = sys.stdout.buffer
         self._py_import_func = py_import_func
         self._supported_features = supported_features
 
@@ -1763,5 +1820,6 @@ class Options:
         # Write response.
         resp = plugin._response()
         if len(self._supported_features) > 0:
-        resp.supported_features = reduce(ior, self._supported_features)
+            resp.supported_features = reduce(ior, self._supported_features)
         self._output.write(resp.SerializeToString())
+        self._output.flush()
