@@ -912,13 +912,14 @@ class Message:
         path: List[int],
     ):
         self.proto = proto
-        self.py_ident = parent_file.py_import_path.ident(
-            self.proto.name
-        )  # TODO how to handle nested messages?
-        if parent is not None:
-            self.full_name = parent.full_name + "." + proto.name
-        else:
+        if parent is None:
             self.full_name = parent_file.proto.package + "." + proto.name
+            self.py_ident = parent_file.py_import_path.ident(self.proto.name)
+        else:
+            self.full_name = parent.full_name + "." + proto.name
+            self.py_ident = parent_file.py_import_path.ident(
+                parent.py_ident.py_name + "." + proto.name
+            )
         self.parent_file = parent_file
         self.parent = parent
         self.location = _resolve_location(parent_file.proto, path)
