@@ -64,6 +64,6 @@ jobs:
           poetry config virtualenvs.in-project true
           poetry install --no-interaction
       - name: Run tests
-        run: poetry run python -m unittest test.test_protogen
+        run: poetry run pytest --ignore=samples/ -v
       - name: Build artifacts
         run: poetry build
