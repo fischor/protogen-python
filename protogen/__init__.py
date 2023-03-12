@@ -53,6 +53,9 @@ import enum
 import keyword
 import sys
 from typing import BinaryIO, Callable, Dict, List, Optional, Set
+from operator import ior
+from functools import reduce
+
 import google.protobuf.descriptor_pool
 import google.protobuf.descriptor_pb2
 import google.protobuf.message_factory
@@ -1575,8 +1578,11 @@ class Options:
         self,
         *,
         py_import_func: Callable[[str, str], PyImportPath] = default_py_import_func,
-        input: BinaryIO = sys.stdin.buffer,
-        output: BinaryIO = sys.stdout.buffer,
+        input: BinaryIO | None = None,
+        output: BinaryIO | None = None,
+        supported_features: List[
+            "google.protobuf.compiler.plugin_pb2.CodeGeneratorResponse.Feature"
+        ] = [],
     ):
         """Create options for the resolution process.
 
@@ -1595,10 +1601,18 @@ class Options:
         output : BinaryIO, optional
             The output stream to write the CodeGeneratorResponse to.
             Defaults to :attr:`sys.stdout.buffer`.
+        supported_features : List[str]
+            List of features that are supported by the plugin. This list will be
+            delegated to protoc via the CodeGeneratorresponse.supported_features
+            field.
+            For example, to indicate that the plugin supports optionals, provide
+            `google.protobuf.compiler.plugin_pb2.CodeGeneratorResponse.Feature.FEATURE_PROTO3_OPTIONAL`.
+            in the list.
         """
         self._input = input
         self._output = output
         self._py_import_func = py_import_func
+        self._supported_features = supported_features
 
     def run(self, f: Callable[[Plugin], None]):
         """Start resolution process and run ``f`` with the :class:`Plugin` containing the resolved classes.
@@ -1675,4 +1689,6 @@ class Options:
 
         # Write response.
         resp = plugin._response()
+        if len(self._supported_features) > 0:
+        resp.supported_features = reduce(ior, self._supported_features)
         self._output.write(resp.SerializeToString())
