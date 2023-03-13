@@ -1704,8 +1704,8 @@ class Options:
         self,
         *,
         py_import_func: Callable[[str, str], PyImportPath] = default_py_import_func,
-        input: BinaryIO | None = None,
-        output: BinaryIO | None = None,
+        input: Optional[BinaryIO] = None,
+        output: Optional[BinaryIO] = None,
         supported_features: List[
             "google.protobuf.compiler.plugin_pb2.CodeGeneratorResponse.Feature"
         ] = [],
