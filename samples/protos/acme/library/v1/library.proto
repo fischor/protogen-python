@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package acme.library.v1;
+
+import "acme/longrunning/operations.proto";
+
+// Note that this import is not actively used in this proto file. However the
+// `metadata_type` of this extension references the `acme.protobuf.Empty` type
+// and it should be resolved and used by the plugin.
+import "acme/protobuf/empty.proto";
+
+service Library {
+
+  rpc WriteBook(WriteBookRequest) returns (acme.longrunning.Operation) {
+    option (acme.longrunning.operation_info) = {
+      response_type : "WriteBookResponse"
+      metadata_type : "acme.protobuf.Empty"
+    };
+  }
+}
+
+message Book { string name = 1; }
+
+message WriteBookRequest { string random_field = 1; }
+
+message WriteBookResponse { string random_field = 1; }
+
+message WriteBookMetadata { string random_field = 1; }

@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package acme.longrunning;
+
+import "acme/protobuf/any.proto";
+import "google/protobuf/descriptor.proto";
+
+extend google.protobuf.MethodOptions { OperationInfo operation_info = 1049; }
+
+message Operation {
+  string name = 1;
+
+  acme.protobuf.Any metadata = 2;
+
+  bool done = 3;
+
+  oneof result {
+    string error = 4;
+    acme.protobuf.Any response = 5;
+  }
+}
+
+message OperationInfo {
+  string response_type = 1;
+  string metadata_type = 2;
+}
