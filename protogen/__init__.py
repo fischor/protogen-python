@@ -1560,9 +1560,10 @@ class GeneratedFile:
 
     def _proto(self) -> google.protobuf.compiler.plugin_pb2.CodeGeneratorResponse.File:
         if self._import_mark > -1:
+            sorted_imports = sorted(self._imports, key=lambda x: x._path)
             lines = (
                 self._buf[: self._import_mark]
-                + [f"import {p._path}" for p in self._imports]
+                + [f"import {p._path}" for p in sorted_imports]
                 + self._buf[self._import_mark :]
             )
         else:
