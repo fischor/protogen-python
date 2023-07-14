@@ -1279,11 +1279,12 @@ class File:
         self,
         proto: google.protobuf.descriptor_pb2.FileDescriptorProto,
         generate: bool,
-        py_import_func: Callable[[str, str], PyImportPath],
+        py_import_func: Callable[[str, str, Dict[str, str]], PyImportPath],
+        parameters: Dict[str, str]
     ):
         self.proto = proto
         self.generated_filename_prefix = proto.name[: -len(".proto")]
-        self.py_import_path = py_import_func(proto.name, proto.package)
+        self.py_import_path = py_import_func(proto.name, proto.package, parameters)
         self.py_package_name = str(proto.package)
         self.generate = generate
         self.dependencies: List[File] = []
@@ -1660,7 +1661,7 @@ class Plugin:
             self._error = msg
 
 
-def default_py_import_func(filename: str, package: str) -> PyImportPath:
+def default_py_import_func(filename: str, package: str, parameters: Dict[str, str]) -> PyImportPath:
     """Return the Python import path for a file.
 
     Return the Python import path for a file following the behaviour of the
@@ -1675,6 +1676,9 @@ def default_py_import_func(filename: str, package: str) -> PyImportPath:
         Filename of the proto file to request the import path for.
     package : str
         Proto package name of the file to request the import path for.
+    parameters: Dict[str, str]
+        Parameters passed to the plugin using ``{plugin name}_opt=<key>=<value>`
+        or ``<plugin>_out=<key>=<value>`` command line flags.
 
     Returns
     -------
@@ -1703,7 +1707,7 @@ class Options:
     def __init__(
         self,
         *,
-        py_import_func: Callable[[str, str], PyImportPath] = default_py_import_func,
+        py_import_func: Callable[[str, str, Dict[str, str]], PyImportPath] = default_py_import_func,
         input: Optional[BinaryIO] = None,
         output: Optional[BinaryIO] = None,
         supported_features: List[
