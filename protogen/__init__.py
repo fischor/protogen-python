@@ -1811,7 +1811,7 @@ class Options:
         files_to_generate: List[File] = []
         for proto in req.proto_file:
             generate = proto.name in req.file_to_generate
-            file = File(proto, generate, self._py_import_func)
+            file = File(proto, generate, self._py_import_func, parameter)
             file._register(registry)
             file._resolve(registry)
             if generate:
