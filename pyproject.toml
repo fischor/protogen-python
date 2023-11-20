@@ -2,6 +2,7 @@
 name = "protogen"
 version = "0.3.1"
 description = "protogen makes writing protoc plugins easy."
+url = "https://github.com/fischor/protogen-python"
 authors = ["fischor <fischor.sh@gmail.com>"]
 maintainers = ["fischor <fischor.sh@gmail.com>"]
 license = "MIT"
