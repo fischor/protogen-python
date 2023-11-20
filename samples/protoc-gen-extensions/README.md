@@ -74,7 +74,7 @@ With that the extension values can be accessed by the plugin.
 Each option added to a proto Method will be present as a field its `Method.proto.options`.
 Each `Method.proto.option` has a `number` field that corresponds to the field number that was assigned to the extension.
 This way one can identify to which extension a `Method.proto.option` belongs.
-See (Line 24 and 25)[./samples/protoc-gen-extensions/plugin.py#L24-L25] in the example plugin.
+See [Line 24 and 25](./samples/protoc-gen-extensions/plugin.py#L24-L25) in the example plugin.
 
 The mechanism to access options for proto Messages, Fields etc. is similar.
 
