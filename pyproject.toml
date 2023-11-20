@@ -6,7 +6,7 @@ authors = ["fischor <fischor.sh@gmail.com>"]
 maintainers = ["fischor <fischor.sh@gmail.com>"]
 license = "MIT"
 readme = "README.md"
-homepage = ""
+homepage = "https://github.com/fischor/protogen-python"
 repository = "https://github.com/fischor/protogen-python"
 keywords = [
     "proto",
