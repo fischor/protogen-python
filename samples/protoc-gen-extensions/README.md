@@ -48,7 +48,7 @@ protoc --proto_path=samples/protos --python_out=. samples/protos/acme/longrunnin
 
 This will generate several files, including `acme/longrunning/operations_pb2.py` that holds the definition of the `OperationInfo` extension.
 
-```
+```python
 OPERATION_INFO_FIELD_NUMBER = 1049
 operation_info = _descriptor.FieldDescriptor(
   name='operation_info', full_name='trainai.longrunning.operation_info', index=0,
@@ -62,7 +62,7 @@ operation_info = _descriptor.FieldDescriptor(
 In the plugin, import the Python module that defines the extension. 
 This should happen before the request from protoc is read (place it somewhere in the beginning of your plugin to be on the safe side).
 
-```
+```python
 import acme.longrunning.operations_pb2
 
 # Somewhere after run your plugin.
@@ -82,7 +82,7 @@ The mechanism to access options for proto Messages, Fields etc. is similar.
 
 Ensure a folder called `output_root` exists:
 
-```
+```sh
 mkdir output_root
 rm -r output_root/acme
 ```
@@ -92,8 +92,3 @@ Then run plugin.
 ```sh
 protoc --plugin=protoc-gen-extensions=samples/protoc-gen-extensions/plugin.py --extensions_out=output_root -I samples/protos samples/protos/acme/**/*.proto
 ```
-
-## Documentation
-
-
-
