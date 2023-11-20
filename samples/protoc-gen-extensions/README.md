@@ -26,7 +26,7 @@ message OperationInfo {
 ```
 
 Note that the option is a `MethodOption` and that field number `1049` was assigned to it.
-The extension is used on methods like this, see [../protos/acme/libarary/v1/library.proto](../protos/acme/libarary/v1/library.proto):
+The extension is used on methods like this, see [../protos/acme/library/v1/library.proto](../protos/acme/library/v1/library.proto):
 
 ```proto
 service Library {
