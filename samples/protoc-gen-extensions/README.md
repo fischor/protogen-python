@@ -71,7 +71,7 @@ protogen.Options(...).run(_generate)
 
 The import will cause the registration of the extension in the proto type registry of the offical `protobuf` lib. 
 With that the extension values can be accessed by the plugin.
-Each options added to a proto Method will be present as a field its `Method.proto.options`.
+Each option added to a proto Method will be present as a field its `Method.proto.options`.
 Each `Method.proto.option` has a `number` field that corresponds to the field number that was assigned to the extension.
 This way one can identify to which extension a `Method.proto.option` belongs.
 See (Line 24 and 25)[./samples/protoc-gen-extensions/plugin.py#L24-L25] in the example plugin.
