@@ -39,8 +39,7 @@ service Library {
 }
 ````
 
-For a plugin that should to recognize this extensions the extension file and its dependencies need to be generated first using the official protoc python compiler.
-This is necessary for the extension values to be accessible by the plugin.
+For a plugin that should recognize this extensions the extension proto file and its dependencies need to be generated first using the official protoc python compiler.
 Generate python code for at least the file where the extension resides in and all its dependencies with the official Python protoc plugin:
 
 ```sh
@@ -70,8 +69,8 @@ import acme.longrunning.operations_pb2
 protogen.Options(...).run(_generate)
 ```
 
-This will register the extension in the type registry (of the offical `protobuf` lib). 
-Now the extension values can be accessed by the plugin.
+The import will cause the registration of the extension in the oroto type registry of the offical `protobuf` lib. 
+With that the extension values can be accessed by the plugin.
 Each options added to a proto Method will be present as a field its `Method.proto.options`.
 Each `Method.proto.option` has a `number` field that corresponds to the field number that was assigned to the extension.
 This way one can identify to which extension a `Method.proto.option` belongs.
