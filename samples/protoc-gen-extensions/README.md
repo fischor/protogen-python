@@ -4,7 +4,7 @@ This sample shows how to use proto3 extensions (`MethodOptions` more specificall
 
 ## How to access extensionn values
 
-This example works with the following `MethodOption` extension that can be found in [./protos/acme/longrunning/operations.proto](./protos/acme/longrunning/operations.proto):
+This example works with the following `MethodOption` extension that can be found in [../protos/acme/longrunning/operations.proto](../protos/acme/longrunning/operations.proto):
 
 ```proto
 extend google.protobuf.MethodOptions { OperationInfo operation_info = 1049; }
