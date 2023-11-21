@@ -38,9 +38,9 @@ def generate(gen: protogen.Plugin):
         )
         g.P("# Generated code ahead.")
         g.P()
-        g.print_imports()
+        g.print_import()
         g.P()
-        for m in f.message:
+        for m in f.messages:
             g.P("class ", m.py_ident, ":")
             for ff in m.fields:
                 # ...
@@ -163,7 +163,7 @@ Assume you have an executable plugin under `path/to/plugin/main.py`.
 You can invoke it via:
 
 ```
-protoc 
+protoc \
     --plugin=protoc-gen-myplugin=path/to/plugin/main.py \
     --myplugin_out=./output_root \
     myproto.proto myproto2.proto
