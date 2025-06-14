@@ -31,7 +31,7 @@ following example plugin:
             )
             g.P("# Generated code ahead.")
             g.P()
-            g.print_imports()
+            g.print_import()
             g.P()
             for m in f.message:
                 g.P("class ", m.py_ident, ":")
@@ -1411,7 +1411,7 @@ class GeneratedFile:
 
     Additionally, the generated file provides mechanism for handling Python
     imports.  Internally it maintains a list of :class:`PyImportPath` s that are
-    requested to be imported.  Use :meth:`print_imports` to mark the position in
+    requested to be imported.  Use :meth:`print_import` to mark the position in
     the output buffer the imports will be printed at.
 
     To create a new instance of a generated file use
@@ -1552,7 +1552,7 @@ class GeneratedFile:
         -------
         >>> g.P("# My python file")
         >>> g.P()
-        >>> g.print_imports()
+        >>> g.print_import()
         >>> g.P()
         >>> g.P("# more content following after the imports..")
         """
