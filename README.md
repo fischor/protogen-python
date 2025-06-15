@@ -96,7 +96,7 @@ If they are from different Python modules, the arguments import path will be add
 
 If both files are from the same `PyImportPath`, then the import path is not added to the list of imports. In that case it is sufficient to reference the `PyIdent` by its simple name (e.g. `Timestamp`), thus only the `PyIdent.py_name` will be printed.
 
-To place the import statements in the buffer of the `GeneratedFile` use `GeneratedFile.print_imports`. This will put a line `"import <path>"` for each `PyImportPath` that the generated file needs to import (e.g `"import google.protobuf.timestamp_pb2"`) in the buffer.
+To place the import statements in the buffer of the `GeneratedFile` use `GeneratedFile.print_import`. This will put a line `"import <path>"` for each `PyImportPath` that the generated file needs to import (e.g `"import google.protobuf.timestamp_pb2"`) in the buffer.
 
 The following example shows how the `GeneratedFile.P` function behaves for different `PyImportPaths`::
 
