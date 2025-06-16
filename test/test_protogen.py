@@ -1,3 +1,4 @@
+import protogen
 from protogen.test import run_plugin
 
 
@@ -43,3 +44,23 @@ def test_parameter():
         golden = f.read()
 
     assert golden == generated
+
+
+def test_with_indent():
+    g = protogen.GeneratedFile("test_with_indent", "")
+    g.P("top-level")
+    with g.indent(2):
+        g.P("indented-by-two")
+        with g.indent(4):
+            g.P("indented-by-six")
+        g.P("return-by-two")
+    g.P("return-top-level")
+
+    expected = [
+        "top-level",
+        "  indented-by-two",
+        "      indented-by-six",
+        "  return-by-two",
+        "return-top-level",
+    ]
+    assert g._buf == expected

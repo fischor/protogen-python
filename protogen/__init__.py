@@ -49,10 +49,11 @@ following example plugin:
 
 """
 
+import contextlib
 import enum
 import keyword
 import sys
-from typing import BinaryIO, Callable, Dict, List, Optional, Set, Tuple
+from typing import BinaryIO, Callable, Dict, List, Iterator, Optional, Set, Tuple
 from operator import ior
 from functools import reduce
 
@@ -1482,6 +1483,34 @@ class GeneratedFile:
         old = self._indent
         self._indent = level
         return old
+
+    @contextlib.contextmanager
+    def indent(self, level: int = 4) -> Iterator[None]:
+        """Increments the indentation within a contextmanager block.
+
+        Increases the indentation level for all calls to :func:`P` within a
+        contextmanager block. When the enclosed block exits, the indentation
+        level will be restored to its prior level.
+
+        Arguments
+        ---------
+        level : int
+            The amount to increment the indentation level by.
+
+        Example
+        -------
+        >>> g.P("class Myclass:")
+        >>> with g.indent():
+        ...     g.P("def __init__():")
+        ...     with g.indent():
+        ...         g.P("pass")
+        """
+        old = self._indent
+        self._indent += level
+        try:
+            yield
+        finally:
+            self._indent = old
 
     def P(self, *args):
         """Add a new line to the output buffer.
