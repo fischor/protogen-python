@@ -26,7 +26,7 @@ following example plugin:
     def generate(gen: protogen.Plugin):
         for f in gen.files_to_generate:
             g = gen.new_generated_file(
-                f.proto.name.replace(".proto", ".py"), 
+                f.proto.name.replace(".proto", ".py"),
                 f.py_import_path,
             )
             g.P("# Generated code ahead.")

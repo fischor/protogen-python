@@ -94,7 +94,7 @@ def generate_extensions(g: protogen.GeneratedFile, e: protogen.Extension):
 
 
 def collect_messages(
-    fm: Union[protogen.File, protogen.Message]
+    fm: Union[protogen.File, protogen.Message],
 ) -> List[protogen.Message]:
     messages = []
     for m in fm.messages:
