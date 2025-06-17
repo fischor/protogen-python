@@ -65,13 +65,11 @@ def generate_message(g: protogen.GeneratedFile, message: protogen.Message, lvl: 
 
 
 def generate_enum(g: protogen.GeneratedFile, e: protogen.Enum, lvl: int):
-    reset = g.set_indent(lvl)
-    g.P("- name: ", e.full_name)
-    g.P("  values:")
-    for v in e.values:
-        g.P("  - name: ", v.full_name)
-
-    g.set_indent(reset)
+    with g.indent(lvl):
+        g.P("- name: ", e.full_name)
+        g.P("  values:")
+        for v in e.values:
+            g.P("  - name: ", v.full_name)
 
 
 def generate_service(g: protogen.Service, s: protogen.Service):
