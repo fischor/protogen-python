@@ -10,14 +10,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2.3.4
+        uses: actions/checkout@v4.2.2
       - name: Setup Python
-        uses: actions/setup-python@v2.2.2
+        uses: actions/setup-python@v5.6.0
         with:
-          python-version: "3.8"
+          python-version: "3.13"
       - name: Permacache Poetry
         id: cache-poetry
-        uses: actions/cache@v2.1.6
+        uses: actions/cache@v4.2.3
         with:
           path: ~/.poetry
           key: poetry
@@ -34,7 +34,7 @@ jobs:
         run: poetry check --no-interaction
       - name: Cache dependencies
         id: cache-deps
-        uses: actions/cache@v2.1.6
+        uses: actions/cache@v4.2.3
         with:
           path: ${{github.workspace}}/.venv
           key: poetry-${{ hashFiles('**/poetry.lock') }}
